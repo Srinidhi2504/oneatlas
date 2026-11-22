@@ -13,12 +13,16 @@
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio",
-    "postinstall": "prisma generate",
+    "postinstall": "prisma generate && tsx scripts/build-code-index.ts",
     "ingest:fetch": "tsx scripts/ingest/fetch.ts",
     "db:seed": "tsx scripts/ingest/seed.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "codeindex": "tsx scripts/build-code-index.ts",
+    "predev": "npm run codeindex",
+    "prebuild": "npm run codeindex"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.12.0",
     "@prisma/adapter-pg": "^7.10.1",
     "@prisma/client": "^7.10.1",
     "@radix-ui/react-dialog": "^1.3.1",

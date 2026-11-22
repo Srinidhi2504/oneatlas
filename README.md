@@ -1,23 +1,24 @@
-# OneAtlas
+﻿# OneAtlas
 
 Find, compare and rank AI models across labs and API providers. OneAtlas covers specs, per-provider pricing, capabilities and benchmarks, all served from Postgres through a typed REST API.
 
-**Live:** _added after the Vercel deploy_ · **API:** `/api/v1` ([contract](docs/05-api-spec.md)) · **Role:** Full Stack Engineer take-home
+**Live:** _added after the Vercel deploy_ Â· **API:** `/api/v1` ([contract](docs/05-api-spec.md)) Â· **Role:** Full Stack Engineer take-home
 
 | | |
 |---|---|
-| Catalog | 724 models · 91 labs · 307 providers · 8,618 provider listings · 30 benchmarks (1,964 scores) |
-| Stack | Next.js 16 (App Router, Cache Components) · React 19 · TypeScript · Tailwind 4 · Node route handlers · PostgreSQL on Neon · Prisma 7 · Zod 4 · TanStack Query 5 · nuqs 2 |
-| Quality | 48 unit tests (Vitest) · Playwright smoke spec · Lighthouse mobile 87 to 90 performance and 100 accessibility / best practices on the main pages |
+| Catalog | 724 models Â· 91 labs Â· 307 providers Â· 8,618 provider listings Â· 30 benchmarks (1,964 scores) |
+| Stack | Next.js 16 (App Router, Cache Components) Â· React 19 Â· TypeScript Â· Tailwind 4 Â· Node route handlers Â· PostgreSQL on Neon Â· Prisma 7 Â· Zod 4 Â· TanStack Query 5 Â· nuqs 2 |
+| Quality | 58 unit tests (Vitest) Â· Playwright smoke spec Â· Lighthouse mobile 87 to 90 performance and 100 accessibility / best practices on the main pages |
 
 ## What you can do
 
 - **Explore** (`/`): search with typo-tolerant matching ("gpt4o" finds GPT-4o), faceted filters with live counts (lab, provider, type), capability chips, sort by price, context, release date, intelligence, value or availability. Switch between table and cards. Every filter lives in the URL, so views are shareable and the back button works.
 - **Model pages** (`/models/{lab}/{slug}`): stat tiles, reference pricing plus a monthly cost calculator, capabilities and modalities, benchmark bars with "#rank of N", Design Arena results, rank chips for every leaderboard, and every provider listing with that provider's own prices.
-- **Compare** (`/compare?ids=…`): 2 to 4 models side by side. The best value in each row is marked with a label as well as colour, there's a "differences only" toggle, a cost calculator at the cheapest provider, and a share link.
+- **Compare** (`/compare?ids=â€¦`): 2 to 4 models side by side. The best value in each row is marked with a label as well as colour, there's a "differences only" toggle, a cost calculator at the cheapest provider, and a share link.
 - **Rankings** (`/rankings/{board}`): reach, intelligence, value, cheapest, context, newest and all 30 benchmarks. Filter by lab, type and capability (ranks are recomputed for the filtered set). Includes a "labs in the top 100" panel and a price vs intelligence scatter that traces the value frontier.
 - **Benchmarks** (`/benchmarks`): a catalogue with each benchmark's leader, plus a score matrix with selectable columns where the best score in each column is highlighted.
 - **Labs and providers**: directories, lab pages (models, served-by providers), provider pages (models with that provider's prices).
+- **Ask the code**: a chat panel (header button or `Ctrl/Cmd+K` â†’ "Ask the code") where Claude explains how this app works by reading its own source. It searches and reads files through three read-only tools, shows the route it took ("Searched for â€¦", "Read src/â€¦"), and answers with `path:line` citations that open the exact lines in a source viewer.
 - **Everywhere**: `Ctrl/Cmd+K` command palette, `/` to focus search, light and dark themes (system default, no flash), a compare tray, and loading, empty and error states.
 
 ## Architecture
@@ -47,7 +48,7 @@ flowchart LR
   RSC -- initial data --> CL
 ```
 
-- **One request, end to end:** a filter change updates the URL (nuqs), which changes the TanStack Query key. The client calls `GET /api/v1/models?…`, the route handler validates the query with the shared Zod schema, and the service builds one `Prisma.ModelWhereInput` and queries Postgres. The mapper converts `Decimal`/`Date` to plain JSON, and the response comes back in the `{ data, meta }` envelope. The server-rendered first page uses the same service and the same canonical query string, so hydration never refetches.
+- **One request, end to end:** a filter change updates the URL (nuqs), which changes the TanStack Query key. The client calls `GET /api/v1/models?â€¦`, the route handler validates the query with the shared Zod schema, and the service builds one `Prisma.ModelWhereInput` and queries Postgres. The mapper converts `Decimal`/`Date` to plain JSON, and the response comes back in the `{ data, meta }` envelope. The server-rendered first page uses the same service and the same canonical query string, so hydration never refetches.
 - **Layers:** route handlers parse, call a service and shape the response. Services hold the logic and are the only Prisma users. Server Components call the same services. See [`docs/03-architecture.md`](docs/03-architecture.md) for the decision log (every deviation from the plan is recorded there).
 - **Caching:** service reads use `'use cache'` + `cacheLife('hours')` + `cacheTag('catalog')`, and API responses set `s-maxage=300, stale-while-revalidate=3600`. After a re-seed, `POST /api/internal/revalidate` (bearer secret) expires the whole catalog at once.
 - **Errors:** every input goes through Zod and returns `400 INVALID_QUERY` with field details. Unknown entities return `404 NOT_FOUND`. Anything else returns `500 INTERNAL` with a request id, and database messages never reach clients.
@@ -57,13 +58,13 @@ flowchart LR
 The key insight is that models.dev already resolves 8,618 provider listings to **658 canonical models** (`canonical_model_id`). That's the spine. OpenRouter adds descriptions and benchmarks (Artificial Analysis indices, Design Arena Elo).
 
 1. `npm run ingest:fetch` downloads both sources to `data/snapshots/` (committed, so seeding is deterministic and offline).
-2. `npm run db:seed` validates every row with Zod (bad rows are logged and skipped, never crash the run). It then groups rows by canonical id and joins OpenRouter with a tested key: a lab alias map (`qwen → alibaba`, `z-ai → zhipuai`, …) plus a slug normaliser that drops `:variant` suffixes, trailing dates and punctuation.
+2. `npm run db:seed` validates every row with Zod (bad rows are logged and skipped, never crash the run). It then groups rows by canonical id and joins OpenRouter with a tested key: a lab alias map (`qwen â†’ alibaba`, `z-ai â†’ zhipuai`, â€¦) plus a slug normaliser that drops `:variant` suffixes, trailing dates and punctuation.
    - **Join result:** 284 of 350 OpenRouter keys match, 5 are ambiguous and all resolved, and 66 become OpenRouter-only models.
-   - **Derived fields:** reference price (first-party → OpenRouter → median), provider count, search key, competition ranks per benchmark, intelligence and value scores.
+   - **Derived fields:** reference price (first-party â†’ OpenRouter â†’ median), provider count, search key, competition ranks per benchmark, intelligence and value scores.
    - **Writes:** labs, providers and models are upserted; listings and scores are replaced in one transaction.
 3. The seed is idempotent (two runs give identical counts) and prints a report checked against sanity bands. A full run takes about 55 s against Neon.
 
-Prices are USD per 1M tokens everywhere. Blended = (3 × input + output) / 4. Value = intelligence / blended price. These formulas were checked against oneatlas.dev for Claude Opus 5.5: $4 / $20 gives a blended $8.00, and value 7.4 at intelligence 59.1.
+Prices are USD per 1M tokens everywhere. Blended = (3 Ã— input + output) / 4. Value = intelligence / blended price. These formulas were checked against oneatlas.dev for Claude Opus 5.5: $4 / $20 gives a blended $8.00, and value 7.4 at intelligence 59.1.
 
 ## Run it locally
 
@@ -71,7 +72,7 @@ Requires Node 22+ and a Postgres database (a free Neon project works).
 
 ```bash
 npm install                    # also runs prisma generate
-cp .env.example .env           # DATABASE_URL (pooled) + DIRECT_URL (direct), optional REVALIDATE_SECRET
+cp .env.example .env           # DATABASE_URL (pooled) + DIRECT_URL (direct); optional REVALIDATE_SECRET, ANTHROPIC_API_KEY
 npm run db:deploy              # migrations: tables, indexes, pg_trgm + trigram index
 npm run db:seed                # ingest data/snapshots (about 1 min)
 npm run dev                    # http://localhost:3000
@@ -95,6 +96,8 @@ All endpoints are `GET` under `/api/v1` unless marked otherwise. The full contra
 | `/providers`, `/providers/{provider}` | Provider directory and paginated listings with the provider's prices |
 | `/rankings/{board}` | Core boards or any benchmark key, filtered and ranked |
 | `/benchmarks`, `/benchmarks/matrix` | Catalogue with leaders; score matrix |
+| `POST /explain` | "Ask the code" assistant: streamed NDJSON (tool steps, answer text), rate limited |
+| `/explain/source` | Source lines around a citation, from the bundled code snapshot |
 | `POST /api/internal/revalidate` | Bearer-protected cache invalidation after a re-seed |
 
 ```bash
@@ -102,6 +105,14 @@ curl "localhost:3000/api/v1/models?q=gpt4o&capability=tools&pageSize=5"
 curl "localhost:3000/api/v1/models?pageSize=1000"   # 400 INVALID_QUERY with field details
 curl "localhost:3000/api/v1/models/nope/nothing"     # 404 NOT_FOUND
 ```
+
+## Ask the code (how the assistant works)
+
+1. `npm run codeindex` (also on install, dev and build) snapshots the source and docs into `src/generated/code-index.json`: allow-listed folders only, never `.env` or `data/`.
+2. `POST /api/v1/explain` validates the chat with Zod, rate-limits per client, and runs a bounded loop on Claude Opus 5.5 (`src/server/explain/assistant.ts`). A cached system prompt holds the project map, README and architecture doc; the model calls `search_code`, `read_file` and `list_files` (`src/server/explain/code-tools.ts`, pure and unit-tested) and streams its answer.
+3. The panel (`src/components/ask/AskPanel.tsx`) reads the NDJSON stream, draws the tool steps as a trail, renders the answer with a small safe Markdown renderer, and opens citations in a source viewer. Stop, retry, clear and copy are built in; the conversation persists for the tab.
+
+Set `ANTHROPIC_API_KEY` to enable it. Without a key the panel explains that it isn't configured. Cost control: at most 6 tool rounds per question, prompt caching, 12 questions per 10 minutes per client.
 
 ## Key decisions
 

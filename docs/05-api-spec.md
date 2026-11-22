@@ -11,6 +11,7 @@ Base path `/api/v1`. Read-only, JSON, `GET` only. All inputs validated with Zod 
 |------|------|------|
 | 400 | `INVALID_QUERY` | Zod failure. `details` = `[{ path, message }]` |
 | 404 | `NOT_FOUND` | unknown lab/model/provider/board |
+| 429 | `RATE_LIMITED` | too many assistant questions from one client (`/explain` only); `Retry-After` header set |
 | 500 | `INTERNAL` | anything else. Generic message, details logged server-side with a request id |
 
 Headers: success `Cache-Control: public, s-maxage=300, stale-while-revalidate=3600`; errors `no-store`. Unknown query params are ignored. CSV params accept `a,b,c`.
@@ -105,6 +106,11 @@ Returns `{ board: { key, label, measure, unit, higherIsBetter, description }, ro
 
 ### `GET /stats` -> `{ models, labs, providers, listings, openWeights, coverage: { toolCall, reasoning, vision, openWeights }  (0..1), updatedAt }`
 ### `GET /health` -> `{ status: "ok", db: "up", models: n, time }` (503 `INTERNAL` if the DB ping fails). Never cached.
+
+### `POST /explain` (the "Ask the code" assistant; not cached)
+Body `{ messages: [{ role: "user"|"assistant", content }] }` (1 to 20 turns, starts and ends with `user`, question <= 2,000 chars). Response: `application/x-ndjson`, one JSON event per line:
+`{type:"tool", name, label}` (a step such as "Read src/lib/db.ts"), `{type:"text", text}` (answer delta, Markdown with `path:line` citations), then `{type:"done"}` or `{type:"error", message}`. Needs `ANTHROPIC_API_KEY`; without it the stream carries one `error` event.
+### `GET /explain/source?path=&line=&end=` -> `{ path, totalLines, start, target, lines[] }` from the bundled code snapshot (404 for paths outside it).
 
 ## Implementation notes
 

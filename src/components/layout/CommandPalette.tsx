@@ -2,9 +2,10 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Command } from "cmdk";
-import { Boxes, Building2, CornerDownLeft, Cpu, LayoutGrid, Search, Server, Trophy } from "lucide-react";
+import { Boxes, Building2, CornerDownLeft, Cpu, LayoutGrid, MessageSquareCode, Search, Server, Trophy } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { openAsk } from "@/components/ask/AskPanel";
 import { api } from "@/lib/api";
 import { formatInteger } from "@/lib/format";
 import type { SearchResult } from "@/lib/types";
@@ -77,12 +78,32 @@ export function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenCh
             <Command.List className="max-h-[min(420px,60vh)] overflow-y-auto p-2">
               {!q ? (
                 <Command.Group heading="Go to" className="[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:text-faint">
+                  <Command.Item value="ask" onSelect={() => { onOpenChange(false); openAsk(); }} className={itemClass}>
+                    <MessageSquareCode aria-hidden />
+                    Ask the code how this app works
+                  </Command.Item>
                   {PAGES.map((p) => (
                     <Command.Item key={p.href} value={p.href} onSelect={() => go(p.href)} className={itemClass}>
                       <p.icon aria-hidden />
                       {p.label}
                     </Command.Item>
                   ))}
+                </Command.Group>
+              ) : null}
+              {q ? (
+                <Command.Group heading="Ask" className="[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:text-faint">
+                  <Command.Item
+                    value="ask-the-code"
+                    onSelect={() => {
+                      onOpenChange(false);
+                      setQuery("");
+                      openAsk(query.trim());
+                    }}
+                    className={itemClass}
+                  >
+                    <MessageSquareCode aria-hidden />
+                    <span className="truncate">Ask the code: “{query.trim()}”</span>
+                  </Command.Item>
                 </Command.Group>
               ) : null}
               {q && isError ? <p className="px-3 py-6 text-center text-muted">Search failed. Check your connection and try again.</p> : null}

@@ -4,6 +4,7 @@ import { GitCompareArrows, Menu, Search, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useCompareList } from "@/lib/compare-store";
+import { AskPanel } from "@/components/ask/AskPanel";
 import { CommandPalette } from "./CommandPalette";
 import { NavLinks } from "./NavLinks";
 import { ThemeToggle } from "./ThemeToggle";
@@ -59,6 +60,8 @@ export function HeaderActions() {
           </span>
         ) : null}
       </Link>
+
+      <AskPanel />
 
       <ThemeToggle />
 

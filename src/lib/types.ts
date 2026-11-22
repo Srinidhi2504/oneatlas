@@ -220,5 +220,5 @@ export interface Matrix {
 }
 
 export interface ApiError {
-  error: { code: "INVALID_QUERY" | "NOT_FOUND" | "INTERNAL"; message: string; details?: unknown };
+  error: { code: "INVALID_QUERY" | "NOT_FOUND" | "RATE_LIMITED" | "INTERNAL"; message: string; details?: unknown };
 }

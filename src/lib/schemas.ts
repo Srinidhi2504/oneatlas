@@ -139,3 +139,28 @@ export function paramsToObject(params: URLSearchParams | Record<string, string |
   }
   return params;
 }
+
+/** POST /api/v1/explain body: the visible chat transcript (text only), oldest first, ending with the user's question. */
+export const explainRequestSchema = z.object({
+  messages: z
+    .array(
+      z.object({
+        role: z.enum(["user", "assistant"]),
+        content: z.string().trim().min(1).max(20_000),
+      }),
+    )
+    .min(1)
+    .max(20, "conversation too long: clear it and ask again")
+    .superRefine((msgs, ctx) => {
+      if (msgs[0].role !== "user" || msgs[msgs.length - 1].role !== "user")
+        ctx.addIssue({ code: "custom", message: "the conversation must start and end with a user message" });
+      const last = msgs[msgs.length - 1];
+      if (last.content.length > 2_000) ctx.addIssue({ code: "custom", message: "questions are limited to 2,000 characters" });
+    }),
+});
+
+export const sourceQuerySchema = z.object({
+  path: z.string().min(1).max(300),
+  line: z.coerce.number().int().min(1).max(100_000).default(1),
+  end: z.coerce.number().int().min(1).max(100_000).optional(),
+});

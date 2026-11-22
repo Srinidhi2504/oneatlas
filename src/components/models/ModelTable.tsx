@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Badge, LabAvatar, Skeleton } from "@/components/ui/primitives";
 import { cn } from "@/lib/cn";
 import { daysSince, formatDate, formatInteger, formatScore, formatTokens } from "@/lib/format";
-import type { ModelSort } from "@/lib/schemas";
+import type { ModelSort } from "@/lib/types";
 import { TONE, TYPE_TONE } from "@/lib/tones";
 import type { ModelListItem } from "@/lib/types";
 import { CapabilityIcons, ModalityIcons, PriceCell } from "./bits";

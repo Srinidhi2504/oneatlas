@@ -1,7 +1,7 @@
 // Labs and providers directories (docs/05 /labs, /providers).
 import type { Prisma } from "@/generated/prisma/client";
 import { db } from "@/lib/db";
-import { toSearchKey } from "@/lib/search-key";
+import { escapeLike, toSearchKey } from "@/lib/search-key";
 import type { FacetCount, LabDetail, LabSummary, Paginated, ProviderDetail, ProviderModelRow, ProviderSummary } from "@/lib/types";
 import { NotFoundError } from "../errors";
 import { isoDate, listMeta, modelListSelect, num, toModelListItem } from "../mappers";
@@ -10,7 +10,7 @@ import { catalogCache, providerModelCounts } from "./common";
 const nameOrSlug = (q: string | undefined) => {
   if (!q) return {};
   const key = toSearchKey(q);
-  return { OR: [{ name: { contains: q, mode: "insensitive" as const } }, ...(key ? [{ slug: { contains: key } }] : [])] };
+  return { OR: [{ name: { contains: escapeLike(q), mode: "insensitive" as const } }, ...(key ? [{ slug: { contains: key } }] : [])] };
 };
 
 export async function listLabs(q: string | undefined, sort: "models" | "name" | "latest"): Promise<LabSummary[]> {

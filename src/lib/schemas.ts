@@ -1,7 +1,9 @@
 // One Zod schema per endpoint input (docs/05). Shared by route handlers (URLSearchParams), Server Component
 // pages (searchParams) and the client. Unknown params are ignored; bad values become a 400 INVALID_QUERY.
 import { z } from "zod";
-import { CAPABILITIES, MODALITIES, MODEL_TYPES } from "./types";
+import { CAPABILITIES, MODALITIES, MODEL_SORTS, MODEL_TYPES, defaultOrder, type ModelSort } from "./types";
+// sort constants live in types.ts (no Zod) so client components can use them without bundling Zod
+export { MODEL_SORTS, defaultOrder, type ModelSort } from "./types";
 
 /** "" and [] count as "not provided"; repeated params (?a=1&a=2) are joined like a CSV. */
 const blankToUndefined = (v: unknown) => {
@@ -36,10 +38,6 @@ export const modelTypeSchema = z.enum(MODEL_TYPES);
 export const capabilitySchema = z.enum(CAPABILITIES);
 export const modalitySchema = z.enum(MODALITIES);
 
-export const MODEL_SORTS = ["relevance", "name", "price", "context", "released", "intelligence", "providers", "value"] as const;
-export type ModelSort = (typeof MODEL_SORTS)[number];
-/** Per-sort default direction (docs/05): name and price ascend, everything else descends. */
-export const defaultOrder = (sort: ModelSort): "asc" | "desc" => (sort === "name" || sort === "price" ? "asc" : "desc");
 
 /** Filters shared by /models, /facets (and a subset by /rankings). */
 const modelFilterShape = {

@@ -8,9 +8,9 @@ import { AskCta } from "./AskCta";
 export async function Hero() {
   const s = await getStats();
   return (
-    <section aria-labelledby="hero-title" className="relative grid items-center gap-2 pt-6 pb-4 sm:pt-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,460px)] lg:gap-8">
+    <section aria-labelledby="hero-title" className="relative grid items-center gap-2 pt-6 pb-4 sm:pt-10 lg:grid-cols-2 lg:gap-8 2xl:pt-14">
       <div className="relative z-[1]">
-        <h1 id="hero-title" className="enter max-w-[14ch] text-[40px] leading-[1.02] font-semibold tracking-[-0.03em] sm:text-[56px]">
+        <h1 id="hero-title" className="enter max-w-[14ch] text-[40px] leading-[1.02] font-semibold tracking-[-0.03em] sm:text-[56px] 2xl:text-[68px]">
           Every AI model, mapped.
         </h1>
         <p className="enter mt-4 max-w-[54ch] text-[15px] leading-relaxed text-muted" style={{ ["--stagger" as string]: 1 }}>
@@ -31,7 +31,7 @@ export async function Hero() {
           <kbd className="rounded border border-border px-1 font-sans">Ctrl K</kbd> for everything.
         </p>
       </div>
-      <div className="relative -mx-4 h-[260px] sm:mx-0 sm:h-[360px] lg:h-[440px]">
+      <div className="relative -mx-4 h-[230px] sm:mx-0 sm:h-[340px] lg:h-[440px] 2xl:h-[540px]">
         {/* soft aurora behind the globe: three palette hues, heavily blurred */}
         <div aria-hidden className="pointer-events-none absolute inset-[12%] opacity-50 blur-3xl">
           <span className="absolute top-[8%] left-[14%] size-[46%] rounded-full" style={{ background: "color-mix(in srgb, var(--accent) 35%, transparent)" }} />

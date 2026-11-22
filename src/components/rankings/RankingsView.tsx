@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQueryStates } from "nuqs";
 import { ScoreBar, PriceCell } from "@/components/models/bits";
-import { Pagination } from "@/components/ui/Pagination";
+import { isPastEnd, Pagination, PastEnd } from "@/components/ui/Pagination";
 import { Button, LabAvatar, Panel, StateMessage } from "@/components/ui/primitives";
 import { SelectMenu } from "@/components/ui/SelectMenu";
 import { api } from "@/lib/api";
@@ -149,6 +149,10 @@ export function RankingsView({
               <StateMessage icon={<TriangleAlert />} title="Couldn’t load this leaderboard" action={<Button onClick={() => query.refetch()}>Retry</Button>}>
                 {query.error.message}
               </StateMessage>
+            </Panel>
+          ) : data && isPastEnd(data.meta, data.rows.length) ? (
+            <Panel>
+              <PastEnd meta={data.meta} onPage={(p) => setState({ page: p === 1 ? null : p })} />
             </Panel>
           ) : data && !data.rows.length ? (
             <Panel>

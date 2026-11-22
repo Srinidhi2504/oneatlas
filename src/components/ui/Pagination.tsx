@@ -2,6 +2,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { formatInteger } from "@/lib/format";
+import { Button, StateMessage } from "./primitives";
 import type { ListMeta } from "@/lib/types";
 
 /** 1 … 4 5 [6] 7 8 … 31 */
@@ -69,5 +70,21 @@ export function Pagination({
         </div>
       ) : null}
     </nav>
+  );
+}
+
+/** True when a ?page= beyond the last page was requested: results exist, this page is just empty. */
+export const isPastEnd = (meta: ListMeta, shown: number) => shown === 0 && meta.total > 0 && meta.page > meta.totalPages;
+
+/** Shown instead of "nothing matches" for an out-of-range ?page= (old link, results shrank after a re-seed). */
+export function PastEnd({ meta, onPage, noun = "models" }: { meta: ListMeta; onPage: (page: number) => void; noun?: string }) {
+  return (
+    <StateMessage
+      icon={<ChevronLeft />}
+      title={`Page ${formatInteger(meta.page)} is past the end`}
+      action={<Button onClick={() => onPage(meta.totalPages)}>Go to page {formatInteger(meta.totalPages)}</Button>}
+    >
+      There are {formatInteger(meta.total)} {noun} on {formatInteger(meta.totalPages)} {meta.totalPages === 1 ? "page" : "pages"}.
+    </StateMessage>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { ModelTable, type SortState } from "@/components/models/ModelTable";
-import { defaultOrder, type ModelSort } from "@/lib/schemas";
+import { defaultOrder, type ModelSort } from "@/lib/types";
 import type { ModelListItem } from "@/lib/types";
 
 const VALUE: Partial<Record<ModelSort, (m: ModelListItem) => number | string | null>> = {

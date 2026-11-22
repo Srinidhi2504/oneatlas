@@ -323,7 +323,7 @@ function Breadcrumb({ path, line, summary }: { path: string; line: number | null
         className="inline-flex h-6 shrink-0 items-center gap-1 rounded px-1.5 text-faint hover:bg-surface-2 hover:text-fg"
       >
         {copied ? <Check className="size-3.5 text-success" aria-hidden /> : <Link2 className="size-3.5" aria-hidden />}
-        <span aria-live="polite">{copied ? "Copied" : line ? `Copy link to line ${line}` : "Copy link"}</span>
+        <span aria-live="polite" className="sr-only sm:not-sr-only">{copied ? "Copied" : line ? `Copy link to line ${line}` : "Copy link"}</span>
       </button>
     </div>
   );

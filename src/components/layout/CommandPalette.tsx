@@ -5,7 +5,7 @@ import { Command } from "cmdk";
 import { Boxes, Building2, CornerDownLeft, Cpu, LayoutGrid, MessageSquareCode, Search, Server, Trophy } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { openAsk } from "@/components/ask/AskPanel";
+import { openAsk } from "@/components/ask/ask-events";
 import { api } from "@/lib/api";
 import { formatInteger } from "@/lib/format";
 import type { SearchResult } from "@/lib/types";

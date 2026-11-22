@@ -10,8 +10,7 @@ import {
   parseAsStringLiteral,
   type inferParserType,
 } from "nuqs/server";
-import { MODEL_SORTS, defaultOrder, type ModelSort } from "@/lib/schemas";
-import { CAPABILITIES, MODEL_TYPES } from "@/lib/types";
+import { CAPABILITIES, MODEL_SORTS, MODEL_TYPES, defaultOrder, type ModelSort } from "@/lib/types";
 
 export const VIEWS = ["table", "cards"] as const;
 

@@ -1,45 +1,34 @@
 "use client";
-import { Monitor, Moon, Sun } from "lucide-react";
-import { useEffect, useState } from "react";
-import { THEME_KEY, type ThemeChoice } from "./theme";
+import { Moon, Sun } from "lucide-react";
+import { THEME_KEY } from "./theme";
 
-const NEXT: Record<ThemeChoice, ThemeChoice> = { system: "light", light: "dark", dark: "system" };
-const ICON = { system: Monitor, light: Sun, dark: Moon };
-
-/** Cycles system -> light -> dark. The choice lives on <html data-theme> + localStorage. */
+/**
+ * Light <-> dark switch. The first visit follows the OS; a click stores an explicit choice on <html data-theme>
+ * and in localStorage. Which icon shows is decided by CSS from the same rules as the colour tokens
+ * (.theme-icon-* in globals.css), so the server-rendered button is right before hydration.
+ */
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<ThemeChoice>("system");
-
-  useEffect(() => {
-    const t = document.documentElement.dataset.theme;
-    // sync from the attribute the inline head script set before hydration
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (t === "light" || t === "dark") setTheme(t);
-  }, []);
-
-  function cycle() {
-    const next = NEXT[theme];
-    setTheme(next);
-    if (next === "system") delete document.documentElement.dataset.theme;
-    else document.documentElement.dataset.theme = next;
+  function toggle() {
+    const root = document.documentElement;
+    const dark = root.dataset.theme ? root.dataset.theme === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const next = dark ? "light" : "dark";
+    root.dataset.theme = next;
     try {
-      if (next === "system") localStorage.removeItem(THEME_KEY);
-      else localStorage.setItem(THEME_KEY, next);
+      localStorage.setItem(THEME_KEY, next);
     } catch {
       /* storage blocked: the choice still applies to this page */
     }
   }
 
-  const Icon = ICON[theme];
   return (
     <button
       type="button"
-      onClick={cycle}
+      onClick={toggle}
       className="inline-flex size-9 items-center justify-center rounded-[var(--radius-control)] text-muted transition-colors hover:bg-surface-2 hover:text-fg"
-      aria-label={`Theme: ${theme}. Switch to ${NEXT[theme]}`}
-      title={`Theme: ${theme}`}
+      aria-label="Switch between light and dark theme"
     >
-      <Icon className="size-4" aria-hidden />
+      <Moon className="theme-icon-light size-4" aria-hidden />
+      <Sun className="theme-icon-dark size-4" aria-hidden />
     </button>
   );
 }

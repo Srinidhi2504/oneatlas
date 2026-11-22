@@ -4,7 +4,7 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { ArrowDown, Columns3, Table2, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useQueryStates } from "nuqs";
-import { Pagination } from "@/components/ui/Pagination";
+import { isPastEnd, Pagination, PastEnd } from "@/components/ui/Pagination";
 import { Button, buttonClass, LabAvatar, Panel, StateMessage } from "@/components/ui/primitives";
 import { SelectMenu } from "@/components/ui/SelectMenu";
 import { api } from "@/lib/api";
@@ -101,6 +101,10 @@ export function MatrixView({
           <StateMessage icon={<TriangleAlert />} title="Couldn’t load the matrix" action={<Button onClick={() => query.refetch()}>Retry</Button>}>
             {query.error.message}
           </StateMessage>
+        </Panel>
+      ) : data && isPastEnd(data.meta, data.rows.length) ? (
+        <Panel>
+          <PastEnd meta={data.meta} onPage={(p) => setState({ page: p === 1 ? null : p })} />
         </Panel>
       ) : data && !data.rows.length ? (
         <Panel>

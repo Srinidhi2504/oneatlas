@@ -151,9 +151,11 @@
 }
 
 /* ---------- motion system: CSS only, every effect has a reduced-motion fallback ---------- */
+/* transform only: an element first painted at opacity 0 is not an LCP candidate, so headings would stop counting
+   and LCP would fall back to whatever repaints last (the logo after the web font swap, ~3 s on mobile) */
 @keyframes rise {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: none; }
+  from { transform: translateY(10px); }
+  to { transform: none; }
 }
 @keyframes pop {
   0% { opacity: 0; transform: scale(0.3); }
@@ -323,3 +325,12 @@
   background: hsl(var(--h) 60% 50%);
 }
 .lab-card { background-image: linear-gradient(to bottom, hsl(var(--h) 60% 50% / 0.06), transparent 55%); }
+
+/* theme toggle: the moon shows in light mode, the sun in dark mode. Same selectors as the tokens, so no JS is needed */
+.theme-icon-dark { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-icon-dark { display: block; }
+  :root:not([data-theme="light"]) .theme-icon-light { display: none; }
+}
+:root[data-theme="dark"] .theme-icon-dark { display: block; }
+:root[data-theme="dark"] .theme-icon-light { display: none; }

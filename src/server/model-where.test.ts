@@ -1,3 +1,4 @@
+import { escapeLike } from "@/lib/search-key";
 import { describe, expect, it } from "vitest";
 import { buildModelWhere, relevanceSort, without } from "./model-where";
 
@@ -9,8 +10,8 @@ describe("buildModelWhere", () => {
 
   it("normalises the search query to the searchKey form", () => {
     expect(buildModelWhere({ q: "GPT-4o", includeDeprecated: true })).toEqual({ AND: [{ searchKey: { contains: "gpt4o" } }] });
-    // a query with no searchable characters is ignored instead of matching everything with ''
-    expect(buildModelWhere({ q: "!!", includeDeprecated: true })).toEqual({});
+    // a query with no searchable characters matches nothing (same as /search), instead of every model
+    expect(buildModelWhere({ q: "!!", includeDeprecated: true })).toEqual({ AND: [{ id: { in: [] } }] });
   });
 
   it("ORs values within a param and ANDs across params", () => {
@@ -56,5 +57,14 @@ describe("buildModelWhere", () => {
     const f = { lab: ["openai"], type: ["text" as const] };
     expect(without(f, "lab")).toEqual({ type: ["text"] });
     expect(f.lab).toEqual(["openai"]); // input untouched
+  });
+});
+
+describe("symbol-only and wildcard queries", () => {
+  it("a query with no letters or digits matches nothing", () => {
+    expect(buildModelWhere({ q: "%" })).toEqual({ AND: [{ id: { in: [] } }, { deprecated: false }] });
+  });
+  it("escapes LIKE wildcards in raw name matches", () => {
+    expect(escapeLike("50%_off\\")).toBe("50\\%\\_off\\\\");
   });
 });

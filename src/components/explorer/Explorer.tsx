@@ -6,13 +6,13 @@ import { useQueryStates } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { ModelCard, ModelCardSkeleton } from "@/components/models/ModelCard";
 import { ModelTable } from "@/components/models/ModelTable";
-import { Pagination } from "@/components/ui/Pagination";
+import { isPastEnd, Pagination, PastEnd } from "@/components/ui/Pagination";
 import { Button, cardGrid, StateMessage } from "@/components/ui/primitives";
 import { SelectMenu } from "@/components/ui/SelectMenu";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/cn";
 import { formatInteger } from "@/lib/format";
-import { defaultOrder, type ModelSort } from "@/lib/schemas";
+import { defaultOrder, type ModelSort } from "@/lib/types";
 import { FILTER_TONE, TONE } from "@/lib/tones";
 import type { Capability, Facets, ModelListItem, Paginated } from "@/lib/types";
 import { FilterPanel } from "./FilterPanel";
@@ -277,6 +277,10 @@ export function Explorer({ initial }: { initial: ExplorerInitial }) {
             >
               {models.error.message}
             </StateMessage>
+          ) : data && isPastEnd(data.meta, data.items.length) ? (
+            <div className="rounded-[var(--radius-panel)] border border-border">
+              <PastEnd meta={data.meta} onPage={goPage} />
+            </div>
           ) : data && data.items.length === 0 ? (
             <StateMessage
               icon={<SearchX />}

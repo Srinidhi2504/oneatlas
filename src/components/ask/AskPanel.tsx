@@ -4,7 +4,7 @@
 //    build-time-resolved citations and follow-up questions. No model call, no cost.
 //  - Live (when the deployment has ANTHROPIC_API_KEY): Claude reads the code through tools (POST /api/v1/explain).
 import * as Dialog from "@radix-ui/react-dialog";
-import { ArrowLeft, ArrowUp, Check, Copy, List, MessageSquareCode, RotateCcw, Sparkles, Square, TriangleAlert, X, Zap } from "lucide-react";
+import { ArrowLeft, ArrowUp, Check, Copy, List, RotateCcw, Sparkles, Square, TriangleAlert, X, Zap } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { cn } from "@/lib/cn";
@@ -12,9 +12,7 @@ import type { ExplainEvent } from "@/server/explain/assistant";
 import type { PreparedAnswer } from "./knowledge";
 import { Markdown, type Citation } from "./Markdown";
 
-export const ASK_OPEN_EVENT = "oneatlas:ask-open";
-/** Open the panel from anywhere (command palette, buttons), optionally with a question to send. */
-export const openAsk = (question?: string) => window.dispatchEvent(new CustomEvent(ASK_OPEN_EVENT, { detail: { question } }));
+import { ASK_OPEN_EVENT } from "./ask-events";
 
 type Mode = "prepared" | "live";
 interface Turn {
@@ -51,8 +49,9 @@ async function loadKb(): Promise<Kb> {
   return { ...mod, anchors };
 }
 
-export function AskPanel() {
-  const [open, setOpen] = useState(false);
+/** Mounted by AskLauncher on first open, so it starts open (with the question that opened it, if any). */
+export function AskPanel({ initialQuestion }: { initialQuestion?: string }) {
+  const [open, setOpen] = useState(true);
   const [turns, setTurns] = useState<Turn[]>([]);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
@@ -274,6 +273,14 @@ export function AskPanel() {
     return () => window.removeEventListener(ASK_OPEN_EVENT, onOpen);
   }, [ask]);
 
+  // the question that opened the panel for the first time (queued until the prepared answers load)
+  const initialAsked = useRef(false);
+  useEffect(() => {
+    if (initialAsked.current || !initialQuestion) return;
+    initialAsked.current = true;
+    ask(initialQuestion);
+  }, [initialQuestion, ask]);
+
   const stop = () => {
     if (finishPlayback.current) finishPlayback.current(); // prepared: show the full answer now
     else abortRef.current?.abort();
@@ -310,13 +317,6 @@ export function AskPanel() {
 
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
-      <Dialog.Trigger
-        className="inline-flex h-9 items-center gap-1.5 rounded-[var(--radius-control)] px-2.5 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-fg"
-        aria-label="Ask the code: how this app works"
-      >
-        <MessageSquareCode className="size-4" aria-hidden />
-        <span className="hidden xl:inline">Ask the code</span>
-      </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-[color-mix(in_srgb,var(--fg)_22%,transparent)]" />
         <Dialog.Content

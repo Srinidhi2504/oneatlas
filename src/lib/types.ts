@@ -10,6 +10,11 @@ export type Modality = (typeof MODALITIES)[number];
 export const CAPABILITIES = ["reasoning", "tools", "structured", "vision", "open", "free"] as const;
 export type Capability = (typeof CAPABILITIES)[number];
 
+export const MODEL_SORTS = ["relevance", "name", "price", "context", "released", "intelligence", "providers", "value"] as const;
+export type ModelSort = (typeof MODEL_SORTS)[number];
+/** Per-sort default direction (docs/05): name and price ascend, everything else descends. */
+export const defaultOrder = (sort: ModelSort): "asc" | "desc" => (sort === "name" || sort === "price" ? "asc" : "desc");
+
 export const CORE_BOARDS = ["reach", "intelligence", "value", "cheapest", "context", "newest"] as const;
 export type CoreBoard = (typeof CORE_BOARDS)[number];
 

@@ -106,12 +106,14 @@ function inline(text: string, onCite: (c: Citation) => void): ReactNode[] {
       );
     } else if (m[2] !== undefined) {
       out.push(<strong key={k++} className="font-semibold">{m[2]}</strong>);
-    } else {
+    } else if (safeHref(m[4])) {
       out.push(
-        <a key={k++} href={m[4]} target="_blank" rel="noreferrer" className="text-accent underline underline-offset-2">
+        <a key={k++} href={m[4]} target="_blank" rel="noopener noreferrer" className="text-accent underline underline-offset-2">
           {m[3]}
         </a>,
       );
+    } else {
+      out.push(m[3]); // javascript:, data: and other schemes render as plain text
     }
     last = re.lastIndex;
   }
@@ -179,3 +181,6 @@ export function Markdown({ text, onCite }: { text: string; onCite: (c: Citation)
     </div>
   );
 }
+
+/** Links in model output may only go to http(s) URLs or same-site paths. */
+export const safeHref = (href: string) => /^(https?:\/\/|\/(?!\/))/i.test(href.trim());

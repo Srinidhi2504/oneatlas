@@ -8,3 +8,6 @@ export const toSearchKey = (...parts: (string | null | undefined)[]) =>
     .join(" ")
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "");
+
+/** Prisma's `contains` becomes ILIKE '%value%' without escaping, so "%" or "_" in user input would match everything. */
+export const escapeLike = (s: string) => s.replace(/[\\%_]/g, "\\$&");

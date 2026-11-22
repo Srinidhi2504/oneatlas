@@ -1,6 +1,6 @@
 "use client";
 import { MessageSquareCode } from "lucide-react";
-import { openAsk } from "@/components/ask/AskPanel";
+import { openAsk } from "@/components/ask/ask-events";
 import { buttonClass } from "@/components/ui/primitives";
 
 export function AskCta() {

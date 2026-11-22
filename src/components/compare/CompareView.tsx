@@ -208,17 +208,20 @@ export function CompareView({ initial, initialIds }: { initial: CompareResult | 
       </div>
 
       <div className={cn("relative overflow-x-auto rounded-[var(--radius-panel)] border border-border transition-opacity", query.isFetching && "opacity-70")} role="region" aria-label="Comparison table, scrolls horizontally" tabIndex={0}>
-        <table className="w-full border-collapse text-13" style={{ minWidth: 180 + models.length * 200 }}>
+        {/* phones: narrower label + model columns so two models fit side by side at 375 px */}
+        <table className="w-full border-collapse text-13 [--cmp-col:122px] [--cmp-label:100px] sm:[--cmp-col:200px] sm:[--cmp-label:180px]" style={{ minWidth: `calc(var(--cmp-label) + ${models.length} * var(--cmp-col))` }}>
           <caption className="sr-only">Side-by-side comparison of {models.map((m) => m.name).join(", ")}. Best values are marked “best”.</caption>
           <thead>
             <tr className="border-b border-border bg-surface">
-              <th scope="col" className="sticky left-0 z-10 w-[180px] bg-surface px-4 py-3 text-left text-xs font-medium text-muted">
+              <th scope="col" className="sticky left-0 z-10 w-[var(--cmp-label)] bg-surface px-3 py-3 text-left text-xs font-medium text-muted sm:px-4">
                 {models.length} models
               </th>
               {models.map((m) => (
-                <th key={m.id} scope="col" className="min-w-[200px] px-4 py-3 text-left align-top font-normal">
+                <th key={m.id} scope="col" className="min-w-[var(--cmp-col)] px-3 py-3 text-left align-top font-normal sm:px-4">
                   <div className="flex items-start gap-2.5">
-                    <LabAvatar slug={m.lab.slug} name={m.lab.name} size={32} />
+                    <span className="hidden sm:block">
+                      <LabAvatar slug={m.lab.slug} name={m.lab.name} size={32} />
+                    </span>
                     <div className="min-w-0 flex-1">
                       <Link href={`/models/${m.id}`} className="block font-semibold hover:text-accent">
                         {m.name}
@@ -237,7 +240,7 @@ export function CompareView({ initial, initialIds }: { initial: CompareResult | 
           {groups.map((g) => (
             <tbody key={g}>
               <tr>
-                <th colSpan={models.length + 1} scope="colgroup" className="sticky left-0 bg-bg px-4 pt-5 pb-2 text-left text-xs font-semibold text-fg">
+                <th colSpan={models.length + 1} scope="colgroup" className="sticky left-0 bg-bg px-3 pt-5 pb-2 text-left text-xs font-semibold text-fg sm:px-4">
                   {g}
                 </th>
               </tr>
@@ -247,11 +250,11 @@ export function CompareView({ initial, initialIds }: { initial: CompareResult | 
                   const best = bestIndexes(r, models);
                   return (
                     <tr key={r.label} className="border-t border-border">
-                      <th scope="row" className="sticky left-0 z-[1] bg-bg px-4 py-2.5 text-left font-normal text-muted">
+                      <th scope="row" className="sticky left-0 z-[1] bg-bg px-3 py-2.5 text-left font-normal text-muted sm:px-4">
                         {r.label}
                       </th>
                       {models.map((m, i) => (
-                        <td key={m.id} className={cn("px-4 py-2.5 align-middle", best.has(i) && "bg-accent-soft font-semibold text-accent")}>
+                        <td key={m.id} className={cn("px-3 py-2.5 align-middle sm:px-4", best.has(i) && "bg-accent-soft font-semibold text-accent")}>
                           <span className="flex items-center gap-2">
                             {r.render(m, best.has(i))}
                             {best.has(i) ? (

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CITATION, parseBlocks } from "./Markdown";
+import { CITATION, parseBlocks, safeHref } from "./Markdown";
 
 describe("assistant markdown", () => {
   it("parses headings, paragraphs, lists and code fences", () => {
@@ -26,5 +26,16 @@ describe("assistant markdown", () => {
     expect("docs/03-architecture.md".match(CITATION)?.[1]).toBe("docs/03-architecture.md");
     expect("listModels()".match(CITATION)).toBeNull();
     expect("use cache".match(CITATION)).toBeNull();
+  });
+});
+
+describe("safeHref", () => {
+  it("allows http(s) and same-site paths only", () => {
+    expect(safeHref("https://models.dev")).toBe(true);
+    expect(safeHref("/models/openai/gpt-5")).toBe(true);
+    expect(safeHref("javascript:alert(1)")).toBe(false);
+    expect(safeHref(" JavaScript:alert(1)")).toBe(false);
+    expect(safeHref("data:text/html,<script>")).toBe(false);
+    expect(safeHref("//evil.example")).toBe(false);
   });
 });

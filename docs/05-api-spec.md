@@ -10,11 +10,12 @@ Base path `/api/v1`. Read-only, JSON, `GET` only. All inputs validated with Zod 
 | HTTP | code | when |
 |------|------|------|
 | 400 | `INVALID_QUERY` | Zod failure. `details` = `[{ path, message }]` |
-| 404 | `NOT_FOUND` | unknown lab/model/provider/board |
+| 404 | `NOT_FOUND` | unknown lab/model/provider/board, or an unknown `/api/*` path |
+| 413 | `INVALID_QUERY` | `/explain` body over 256 KB |
 | 429 | `RATE_LIMITED` | too many assistant questions from one client (`/explain` only); `Retry-After` header set |
 | 500 | `INTERNAL` | anything else. Generic message, details logged server-side with a request id |
 
-Headers: success `Cache-Control: public, s-maxage=300, stale-while-revalidate=3600`; errors `no-store`. Unknown query params are ignored. CSV params accept `a,b,c`.
+Headers: success `Cache-Control: public, s-maxage=300, stale-while-revalidate=3600`; errors `no-store`. Unknown query params are ignored. CSV params accept `a,b,c`. A `page` past the last page returns `data: []` with the real `totalPages` (clients offer a link back). Free-text `q` with no letters or digits matches nothing.
 
 ## Shared shapes (TypeScript, put in `src/lib/types.ts` or derive from Zod)
 

@@ -8,7 +8,8 @@ import { Providers } from "@/components/providers";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+// mono is only used for ids and the code viewer: no preload, so it never competes with the page font
+const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"], preload: false });
 
 export const metadata: Metadata = {
   title: { default: "OneAtlas: every AI model, compared", template: "%s · OneAtlas" },
@@ -38,7 +39,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </a>
         <Providers>
           <Header />
-          <main id="main" className="mx-auto w-full max-w-[1280px] flex-1 px-4 sm:px-6">
+          <main id="main" className="w-full min-w-0 flex-1 px-4 sm:px-6 lg:px-8 2xl:px-10">
             {children}
           </main>
           <Footer />

@@ -2,7 +2,7 @@
 import { connection } from "next/server";
 import { db } from "@/lib/db";
 import type { ModelFilters } from "@/lib/schemas";
-import { toSearchKey } from "@/lib/search-key";
+import { escapeLike, toSearchKey } from "@/lib/search-key";
 import { CAPABILITIES, MODALITIES, type Facets, type ModelType, type SearchResult, type Stats } from "@/lib/types";
 import { num } from "../mappers";
 import { buildModelWhere, relevanceSort, without } from "../model-where";
@@ -12,7 +12,7 @@ export async function search(q: string, limit: number): Promise<SearchResult> {
   "use cache";
   catalogCache();
   const key = toSearchKey(q);
-  const nameMatch = { contains: q.trim(), mode: "insensitive" as const };
+  const nameMatch = { contains: escapeLike(q.trim()), mode: "insensitive" as const };
   const [models, labs, providers, counts] = await Promise.all([
     key
       ? db.model.findMany({

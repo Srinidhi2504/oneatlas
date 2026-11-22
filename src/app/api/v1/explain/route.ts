@@ -18,17 +18,24 @@ export async function GET() {
  * Streams newline-delimited JSON events (ExplainEvent): text deltas, tool steps ("Read src/..."), then done or error.
  * The only non-GET, non-cached endpoint: answers depend on the conversation (docs/03 decision log).
  */
+// 20 turns of prior answers fit well under this; anything bigger is not a chat (checked before parsing)
+const MAX_BODY_BYTES = 256 * 1024;
+
 export async function POST(req: Request) {
+  if (Number(req.headers.get("content-length") ?? 0) > MAX_BODY_BYTES) return fail(413, "INVALID_QUERY", "Conversation too long: clear it and ask again.");
   let body: unknown;
   try {
-    body = await req.json();
+    const raw = await req.text(); // chunked bodies have no length header: measured again below
+    if (new TextEncoder().encode(raw).byteLength > MAX_BODY_BYTES) return fail(413, "INVALID_QUERY", "Conversation too long: clear it and ask again.");
+    body = JSON.parse(raw);
   } catch {
     return fail(400, "INVALID_QUERY", "Body must be JSON: { messages: [{ role, content }] }.");
   }
   const parsed = explainRequestSchema.safeParse(body);
   if (!parsed.success) return toErrorResponse(parsed.error);
 
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
+  // Vercel sets x-real-ip itself; the left-most x-forwarded-for entry can be supplied by the client
+  const ip = req.headers.get("x-real-ip") || req.headers.get("x-forwarded-for")?.split(",").at(-1)?.trim() || "local";
   const allowed = limit(ip);
   if (!allowed.ok) {
     const res = fail(429, "RATE_LIMITED", `Too many questions. Try again in ${allowed.retryAfter} s.`);

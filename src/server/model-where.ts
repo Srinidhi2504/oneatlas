@@ -31,6 +31,7 @@ export function buildModelWhere(f: ModelFilterInput): Prisma.ModelWhereInput {
   const key = f.q ? toSearchKey(f.q) : "";
   // searchKey is already normalised, so a plain LIKE '%key%' is case-safe and served by the pg_trgm GIN index
   if (key) and.push({ searchKey: { contains: key } });
+  else if (f.q?.trim()) and.push({ id: { in: [] } }); // a query of only symbols ("%", "!!") matches nothing, not everything
   if (f.lab?.length) and.push({ lab: { slug: { in: f.lab } } });
   if (f.provider?.length) and.push({ listings: { some: { provider: { slug: { in: f.provider } } } } });
   if (f.type?.length) and.push({ type: { in: f.type.map((t) => t.toUpperCase() as Uppercase<ModelType>) } });

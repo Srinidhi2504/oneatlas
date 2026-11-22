@@ -79,6 +79,27 @@ test("code viewer opens a deep-linked file at the selected line", async ({ page 
   await expect(page.getByRole("tab", { name: /pricing\.ts/ })).toBeVisible();
 });
 
+test("ask the code loads on first open and plays a prepared answer; theme switches light/dark", async ({ page }) => {
+  await page.goto("/code");
+  const dialog = page.getByRole("dialog", { name: "Ask the code" });
+  // the panel chunk loads on first click (retry until hydrated)
+  await expect(async () => {
+    await page.getByRole("button", { name: /Ask the code/ }).click();
+    await expect(dialog).toBeVisible({ timeout: 2_000 });
+  }).toPass();
+  await dialog.getByRole("textbox", { name: "Your question about the code" }).fill("what is oneatlas");
+  await dialog.getByRole("button", { name: "Send question" }).click();
+  await expect(dialog).toContainText("OneAtlas", { timeout: 20_000 });
+  await page.keyboard.press("Escape");
+
+  const theme = page.getByRole("button", { name: "Switch between light and dark theme" });
+  const before = await page.evaluate(() => document.documentElement.dataset.theme ?? "");
+  await theme.click();
+  const after = await page.evaluate(() => document.documentElement.dataset.theme);
+  expect(["light", "dark"]).toContain(after);
+  expect(after).not.toBe(before);
+});
+
 test("unknown model renders the branded 404 and the API returns the error envelope", async ({ page, request }) => {
   await page.goto("/models/nope/nothing");
   await expect(page.getByRole("heading", { name: "This page isn’t on the map" })).toBeVisible();

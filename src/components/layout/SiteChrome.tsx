@@ -8,9 +8,9 @@ import { NavLinks, NavList } from "./NavLinks";
 export function Header() {
   return (
     <header className="header-elevate sticky top-0 z-40 border-b border-border bg-bg">
-      <div className="mx-auto flex h-14 max-w-[1280px] items-center gap-4 px-4 sm:px-6">
+      <div className="flex h-14 items-center gap-4 px-4 sm:px-6 lg:px-8 2xl:px-10">
         <Logo />
-        <nav aria-label="Main" className="hidden md:block">
+        <nav aria-label="Main" className="hidden lg:block">
           {/* usePathname() is runtime data under Cache Components: stream the active state, keep the links static */}
           <Suspense fallback={<NavList />}>
             <NavLinks />
@@ -29,7 +29,7 @@ export async function Footer() {
   const stats = await getStats();
   return (
     <footer className="mt-16 border-t border-border">
-      <div className="mx-auto grid max-w-[1280px] gap-6 px-4 py-8 text-13 text-muted sm:grid-cols-[1fr_auto] sm:px-6">
+      <div className="grid gap-6 px-4 py-8 text-13 text-muted sm:grid-cols-[1fr_auto] sm:px-6 lg:px-8 2xl:px-10">
         <div className="space-y-1.5">
           <p>
             Data from{" "}

@@ -61,14 +61,15 @@ export function CompareTray() {
   if (!items.length || pathname?.startsWith("/compare")) return null;
   const href = `/compare?ids=${items.map((i) => i.id).join(",")}`;
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-4 z-30 flex justify-center px-4">
+    <div className="pointer-events-none fixed inset-x-0 bottom-[max(1rem,env(safe-area-inset-bottom))] z-30 flex justify-center px-4">
       <div
         role="region"
         aria-label="Compare selection"
         className="pointer-events-auto flex w-full max-w-[880px] flex-wrap items-center gap-2 rounded-[var(--radius-panel)] border border-border-strong bg-bg p-2 pl-3 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.3)]"
       >
         <GitCompareArrows className="size-4 text-accent" aria-hidden />
-        <ul className="flex min-w-0 flex-1 flex-wrap gap-1.5">
+        {/* phones: names hidden so the tray stays one row; the count and Compare button carry it */}
+        <ul className="hidden min-w-0 flex-1 flex-wrap gap-1.5 sm:flex">
           {items.map((i) => (
             <li key={i.id} className="flex h-7 max-w-[200px] items-center gap-1 rounded-[var(--radius-control)] border border-border bg-surface pr-0.5 pl-2 text-13">
               <span className="truncate">{i.name}</span>
@@ -83,7 +84,7 @@ export function CompareTray() {
             </li>
           ))}
         </ul>
-        <span className="text-xs text-muted" aria-live="polite">
+        <span className="flex-1 text-xs text-muted sm:flex-none" aria-live="polite">
           {items.length < 2 ? "Pick one more to compare" : items.length >= COMPARE_MAX ? `${COMPARE_MAX} of ${COMPARE_MAX}: remove one to add another` : `${items.length} of ${COMPARE_MAX}`}
         </span>
         <button type="button" onClick={clear} className={buttonClass("ghost", "sm")}>

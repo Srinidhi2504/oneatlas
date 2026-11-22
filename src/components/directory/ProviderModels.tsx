@@ -4,7 +4,7 @@ import { SearchX, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useQueryStates } from "nuqs";
 import { useEffect, useState } from "react";
-import { Pagination } from "@/components/ui/Pagination";
+import { isPastEnd, Pagination, PastEnd } from "@/components/ui/Pagination";
 import { Badge, Button, LabAvatar, Panel, StateMessage } from "@/components/ui/primitives";
 import { SelectMenu } from "@/components/ui/SelectMenu";
 import { api } from "@/lib/api";
@@ -66,6 +66,10 @@ export function ProviderModels({ slug, initial, initialQs }: { slug: string; ini
           <StateMessage icon={<TriangleAlert />} title="Couldn’t load this provider’s models" action={<Button onClick={() => query.refetch()}>Retry</Button>}>
             {query.error.message}
           </StateMessage>
+        </Panel>
+      ) : data && isPastEnd(data.meta, data.items.length) ? (
+        <Panel>
+          <PastEnd meta={data.meta} noun="listings" onPage={(p) => setState({ page: p === 1 ? null : p })} />
         </Panel>
       ) : data && !data.items.length ? (
         <Panel>

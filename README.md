@@ -21,7 +21,7 @@ Find, compare and rank AI models across labs and API providers. OneAtlas covers 
 - **Ask the code**: a chat panel (header button, hero button or `Ctrl/Cmd+K` → "Ask the code") that explains how this app is built. By default it serves **32 prepared answers**, ordered by importance, written against the real code and free to run. Each plays back like a live answer: a reading trail ("Read src/…"), streamed text, `path:line` citations that open the exact lines, and follow-up questions. Unmatched questions get the closest suggestions. A **Live** mode (Claude reading the code through tools) is fully built and switches on when `ANTHROPIC_API_KEY` is set.
 - **Code** (`/code`): the whole codebase in an editor-style viewer, with a file tree showing each file's purpose, tabs, breadcrumbs, syntax highlighting (in-house, no dependency), search across files and `Ctrl+P` quick open. Every line has a shareable link (`/code?path=…&line=…`), and source citations in Ask the code open there.
 - **Look and feel**: a canvas-drawn 3D globe in the hero (drag to spin), scroll-driven 3D section reveals, rolling odometer numbers, pointer-tilt cards, a 3D podium on leaderboards and growing score bars. A six-hue palette (light and dark) colour-codes capabilities, model types, benchmark groups, medals and labs. All CSS or canvas with no animation library, and all switched off under `prefers-reduced-motion`.
-- **Everywhere**: `Ctrl/Cmd+K` command palette, `/` to focus search, light and dark themes (system default, no flash), a compare tray, and loading, empty and error states.
+- **Everywhere**: `Ctrl/Cmd+K` command palette, `/` to focus search, a light/dark switch (follows the OS on first visit, no flash), a compare tray, and loading, empty and error states.
 
 ## Architecture
 
@@ -132,12 +132,21 @@ Set `ANTHROPIC_API_KEY` to show the Live toggle. Cost control: at most 6 tool ro
 | `Decimal(12,6)` money in the DB, `number` in DTOs | Exact sub-cent prices; conversion happens only in the mapper |
 | URL is the state (nuqs) | Every view is shareable and back-button safe |
 
+## Security
+
+- No secrets reach the browser: no `NEXT_PUBLIC_` variables, database and API keys are read only in server code, and the build output and code snapshot are scanned for secret values (none found). The code snapshot excludes `.env*` and generated files; paths outside it return 404, so there is no file traversal.
+- Every query input is validated with Zod (lengths, ranges, slug patterns); `ILIKE` wildcards in user text are escaped; raw SQL is parameterised.
+- Headers on every response: CSP (same-origin scripts, styles, fonts and fetches; no framing; no plugins), `X-Content-Type-Options`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`, HSTS. `X-Powered-By` is off.
+- `POST /explain` is rate-limited per client (12 per 10 minutes), caps the body at 256 KB and the question at 2,000 characters; links in model output may only be http(s) or same-site. The revalidate endpoint compares its token in constant time and answers 404 to anything else.
+- Errors use the JSON envelope (unknown `/api/*` paths included) and never include Prisma or Postgres messages.
+
 ## Limitations
 
 - Coverage: models.dev rows without a canonical id (1,405, mostly small gateways) are not ingested, and OpenRouter exposes no coding or agentic index today. So the catalog has 724 models against oneatlas.dev's 1,118.
 - Provider counts are 15 to 30% higher than oneatlas.dev because every models.dev provider id counts separately (plans and regional variants included).
 - Unknown model URLs render the branded 404 page with HTTP 200: the streamed static shell is sent before `notFound()` runs. The API returns a real 404.
 - Filtered ranks, search relevance and the benchmark matrix are computed in memory over at most about 1k light rows. That's fine at this size; the 100x plan is below.
+- The CSP allows inline scripts: nonces would make every page render per request and give up the prerendered shells. Everything else is locked to this origin.
 - No auth, writes, live provider uptime or long-context price tiers (out of scope).
 
 ## What I would do next

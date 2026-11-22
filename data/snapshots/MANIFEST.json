@@ -1,0 +1,8 @@
+{
+  "fetchedAt": "2026-11-22",
+  "note": "Baseline snapshots every number in docs/ was measured against. Refresh with the ingest:fetch script (to be built in roadmap P1); never hand-edit.",
+  "sources": {
+    "openrouter-models.json": { "url": "https://openrouter.ai/api/v1/models", "auth": "none", "entries": 476 },
+    "modelsdev.json": { "url": "https://models.dev/api.json", "auth": "none", "providers": 324, "modelRows": 10023 }
+  }
+}

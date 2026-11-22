@@ -1,0 +1,163 @@
+// OneAtlas data model. Rationale + ingestion rules: docs/04-data-model-and-ingestion.md
+// Prisma 7: no `url` here (it lives in prisma7.config.ts); a driver adapter is required at runtime (src/lib/db.ts).
+// Prices are USD per 1M tokens. Decimal(12,6) keeps sub-cent prices exact (e.g. 0.075).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ModelType {
+  TEXT
+  IMAGE
+  VIDEO
+  EMBEDDING
+  SPEECH
+  TRANSCRIPTION
+  RERANK
+  REALTIME
+}
+
+model Lab {
+  id        String   @id @default(cuid())
+  slug      String   @unique // url + join key: "anthropic", "zhipuai"
+  name      String
+  website   String?
+  models    Model[]
+  providers Provider[] // set when a provider is the lab's own API (first-party)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Model {
+  id              String    @id @default(cuid())
+  labId           String
+  lab             Lab       @relation(fields: [labId], references: [id])
+  slug            String // unique within lab; /models/[lab.slug]/[slug]
+  name            String
+  description     String?
+  type            ModelType @default(TEXT)
+  family          String?
+  releasedAt      DateTime? @db.Date
+  knowledgeCutoff DateTime? @db.Date // source may give "2025-05": stored as the 1st of that month
+  deprecated      Boolean   @default(false) // source status = "deprecated" (models.dev gives no date)
+
+  // specs
+  contextWindow    Int?
+  maxOutputTokens  Int?
+  inputModalities  String[] // text | image | audio | video | pdf
+  outputModalities String[]
+
+  // capabilities (filterable)
+  reasoning        Boolean @default(false)
+  toolCall         Boolean @default(false)
+  structuredOutput Boolean @default(false)
+  vision           Boolean @default(false) // derived: "image" in inputModalities
+  openWeights      Boolean @default(false)
+
+  // reference price = first-party listing, else OpenRouter, else median of listings
+  inputPrice      Decimal? @db.Decimal(12, 6)
+  outputPrice     Decimal? @db.Decimal(12, 6)
+  cacheReadPrice  Decimal? @db.Decimal(12, 6)
+  cacheWritePrice Decimal? @db.Decimal(12, 6)
+  blendedPrice    Decimal? @db.Decimal(12, 6) // (3*input + output) / 4, see src/lib/pricing.ts
+  isFree          Boolean  @default(false)
+
+  // denormalised at ingest so list sorts/filters need no join (source of truth = BenchmarkScore / ProviderModel)
+  providerCount     Int    @default(0)
+  intelligenceIndex Float?
+
+  openrouterId String? @unique // set when OpenRouter data was joined (or the model exists only there)
+  searchKey    String // normalised lab+name+slug, lowercase a-z0-9 only: "gpt4o" matches "GPT-4o"
+
+  listings ProviderModel[]
+  scores   BenchmarkScore[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([labId, slug])
+  @@index([type])
+  @@index([labId])
+  @@index([releasedAt(sort: Desc)])
+  @@index([blendedPrice])
+  @@index([contextWindow])
+  @@index([providerCount(sort: Desc)])
+  @@index([intelligenceIndex(sort: Desc)])
+  // plus GIN trigram index on searchKey: created in migration SQL (Prisma cannot express gin_trgm_ops here)
+}
+
+model Provider {
+  id        String          @id @default(cuid())
+  slug      String          @unique // models.dev provider id
+  name      String
+  apiUrl    String?
+  docUrl    String?
+  labId     String? // non-null => first-party provider for that lab
+  lab       Lab?            @relation(fields: [labId], references: [id])
+  listings  ProviderModel[]
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+}
+
+// One row = one model served by one provider ("API listing"). A provider may list a model under several ids.
+model ProviderModel {
+  id              String   @id @default(cuid())
+  providerId      String
+  provider        Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  modelId         String
+  model           Model    @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  providerModelId String // id used in that provider's API, e.g. "us.anthropic.claude-opus-5-5"
+
+  contextWindow   Int?
+  inputLimit      Int?
+  maxOutputTokens Int?
+  inputPrice      Decimal? @db.Decimal(12, 6)
+  outputPrice     Decimal? @db.Decimal(12, 6)
+  reasoningPrice  Decimal? @db.Decimal(12, 6)
+  cacheReadPrice  Decimal? @db.Decimal(12, 6)
+  cacheWritePrice Decimal? @db.Decimal(12, 6)
+
+  // null = unknown (the source did not say)
+  reasoning        Boolean?
+  toolCall         Boolean?
+  structuredOutput Boolean?
+  temperature      Boolean?
+
+  status          String? // models.dev: "deprecated" | "beta" | "alpha"; null = generally available
+  sourceUpdatedAt DateTime? @db.Date
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([providerId, providerModelId])
+  @@index([modelId])
+  @@index([providerId])
+}
+
+model Benchmark {
+  id             String           @id @default(cuid())
+  key            String           @unique // "intelligence", "coding", "arena", "arena-website", ...
+  name           String
+  group          String // "Artificial Analysis" | "Design Arena"
+  category       String // filter facet: general | coding | agentic | domain | design
+  unit           String // "index" | "elo"
+  higherIsBetter Boolean          @default(true)
+  sourceUrl      String?
+  scores         BenchmarkScore[]
+}
+
+model BenchmarkScore {
+  modelId     String
+  model       Model     @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  benchmarkId String
+  benchmark   Benchmark @relation(fields: [benchmarkId], references: [id], onDelete: Cascade)
+  value       Float
+  winRate     Float? // design arena only, percent
+  rank        Int // precomputed at ingest, 1 = best, ties share a rank
+
+  @@id([modelId, benchmarkId])
+  @@index([benchmarkId, rank])
+}

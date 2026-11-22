@@ -13,6 +13,7 @@ import {
   mapModelsDevType,
   mapOpenRouterType,
   median,
+  disambiguateNames,
   mostCommon,
   modelsDevProviderSchema,
   modelsDevRowSchema,
@@ -246,6 +247,8 @@ for (const { lab, slug, entry } of orOnly) {
     listings: [],
   });
 }
+
+disambiguateNames(models);
 
 // ---------- 6. benchmarks: catalogue, scores, ranks ----------
 

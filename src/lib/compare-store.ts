@@ -53,6 +53,14 @@ function subscribe(listener: () => void) {
   };
 }
 
+/** Stable (module-level) so it can sit in effect dependencies; skips the write when nothing changed. */
+export function replaceCompareList(entries: CompareEntry[]) {
+  const next = entries.slice(0, COMPARE_MAX);
+  const cur = read();
+  if (cur.length === next.length && cur.every((e, i) => e.id === next[i].id && e.name === next[i].name)) return;
+  write(next);
+}
+
 export function useCompareList() {
   const items = useSyncExternalStore(subscribe, read, () => EMPTY);
   const has = (id: string) => items.some((e) => e.id === id);
@@ -71,7 +79,6 @@ export function useCompareList() {
       return true;
     },
     remove: (id: string) => write(items.filter((e) => e.id !== id)),
-    replace: (entries: CompareEntry[]) => write(entries.slice(0, COMPARE_MAX)),
     clear: () => write([]),
   };
 }

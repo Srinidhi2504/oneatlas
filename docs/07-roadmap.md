@@ -43,27 +43,27 @@ Files: `src/lib/schemas.ts`, `src/server/{http.ts,mappers.ts,services/*}`, `src/
 
 ## P3 Core UI: explorer and detail (`docs/06`)
 
-- [ ] Design tokens + layout shell (Header, Footer, skip link), `format.ts` (+ test), `ui/` primitives, lab Avatar
-- [ ] TanStack Query provider; nuqs adapter; typed API client in `src/lib/api.ts` (fetch + Zod-free typed response, throws on `error` envelope)
-- [ ] Explorer: SSR initial data + client `Explorer` (filters, chips, sort, pagination, table + cards, all states)
-- [ ] `CommandPalette` (native dialog) + `/search`
-- [ ] Compare tray + `useCompareList`
-- [ ] Model detail page (all sections, `generateStaticParams` top 50, `generateMetadata`, `notFound`)
+- [x] Design tokens + layout shell (Header, Footer, skip link), `format.ts` (+ test), `ui/` primitives, lab Avatar
+- [x] TanStack Query provider; nuqs adapter; typed API client in `src/lib/api.ts` (fetch + Zod-free typed response, throws on `error` envelope)
+- [x] Explorer: SSR initial data + client `Explorer` (filters, chips, sort, pagination, table + cards, all states)
+- [x] `CommandPalette` (native dialog) + `/search`
+- [x] Compare tray + `useCompareList`
+- [x] Model detail page (all sections, `generateStaticParams` top 50, `generateMetadata`, `notFound`)
 - [ ] Checked at 375 / 768 / 1280 px, keyboard-only pass, no console errors
 
 ## P4 Compare, rankings, benchmarks, labs, providers
 
-- [ ] `/compare` page (grouped rows, best highlight, diff toggle, share URL)
-- [ ] `/rankings/[board]` (boards, benchmark picker, filters, score bars, labTop panel) + redirect from `/rankings`
-- [ ] `/benchmarks` matrix
-- [ ] `/labs` + `/labs/[slug]`; `/providers` + `/providers/[slug]`
-- [ ] Global `not-found.tsx` and `error.tsx`
+- [x] `/compare` page (grouped rows, best highlight, diff toggle, share URL)
+- [x] `/rankings/[board]` (boards, benchmark picker, filters, score bars, labTop panel) + redirect from `/rankings`
+- [x] `/benchmarks` matrix
+- [x] `/labs` + `/labs/[slug]`; `/providers` + `/providers/[slug]`
+- [x] Global `not-found.tsx` and `error.tsx`
 - [ ] Seed the production DB, redeploy, full click-through on the **live URL** against the acceptance criteria in `01` (this is the MVP)
 
 ## P5 Polish (after MVP is live)
 
-- [ ] Cost calculator on detail and compare
-- [ ] Price-vs-intelligence scatter on Rankings (lazy-loaded Recharts, table fallback)
+- [x] Cost calculator on detail and compare
+- [x] Price-vs-intelligence scatter on Rankings (lazy-loaded Recharts, table fallback)
 - [ ] Playwright smoke test: explorer filter -> detail -> compare -> rankings (`npx playwright install chromium`; keep to 1 spec)
 - [ ] Lighthouse mobile pass (Performance, A11y >= 90), fix top 3 findings; bundle check
 - [ ] `POST /api/internal/revalidate` (bearer secret) calling `revalidateTag('catalog')`

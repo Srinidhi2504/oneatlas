@@ -132,6 +132,26 @@ export function mostCommon(values: string[]): string {
   return [...counts].sort((a, b) => b[1] - a[1] || a[0].length - b[0].length || a[0].localeCompare(b[0]))[0][0];
 }
 
+/**
+ * Two models of one lab can end up with the same display name (a dated snapshot shares its parent's name).
+ * The shortest slug keeps the name; the others get what makes their slug different: "DeepSeek V4 Pro (0423)".
+ */
+export function disambiguateNames<T extends { lab: string; slug: string; name: string }>(models: T[]): void {
+  const groups = new Map<string, T[]>();
+  for (const m of models) {
+    const k = `${m.lab}\u0000${m.name.toLowerCase()}`;
+    groups.set(k, [...(groups.get(k) ?? []), m]);
+  }
+  for (const group of groups.values()) {
+    if (group.length < 2) continue;
+    const [base, ...rest] = [...group].sort((a, b) => a.slug.length - b.slug.length || a.slug.localeCompare(b.slug));
+    for (const m of rest) {
+      const suffix = m.slug.startsWith(base.slug) ? m.slug.slice(base.slug.length).replace(/^[-_.:]+/, "") : "";
+      m.name = `${m.name} (${suffix || m.slug})`;
+    }
+  }
+}
+
 /** "Thinking Machines: Inkling 2 Mini" -> { lab: "Thinking Machines", model: "Inkling 2 Mini" } */
 export function splitOpenRouterName(name: string): { lab: string | null; model: string } {
   const i = name.indexOf(": ");

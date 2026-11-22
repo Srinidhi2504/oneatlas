@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
+import { CostCalculator } from "@/components/compare/CostCalculator";
 import { ModalityChips, ScoreBar } from "@/components/models/bits";
 import { CompareButton } from "@/components/models/compare";
 import { ModelCard } from "@/components/models/ModelCard";
@@ -148,6 +149,8 @@ async function ModelView({ params }: Pick<PageProps<"/models/[lab]/[slug]">, "pa
               </Panel>
             )}
           </section>
+
+          {m.pricing.input != null || m.listings.length ? <CostCalculator models={[m]} /> : null}
 
           <section aria-labelledby="providers">
             <SectionTitle

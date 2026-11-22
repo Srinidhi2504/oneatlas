@@ -5,6 +5,7 @@ import {
   mapModelsDevType,
   mapOpenRouterType,
   median,
+  disambiguateNames,
   mostCommon,
   modelsDevRowSchema,
   normalizeModalities,
@@ -59,6 +60,17 @@ describe("normalisers", () => {
     expect(median([null])).toBeNull();
     expect(competitionRanks([50, 70, 70, 10])).toEqual([3, 1, 1, 4]);
     expect(competitionRanks([5, 1, 3], false)).toEqual([3, 1, 2]);
+  });
+
+  it("disambiguates duplicate names within a lab", () => {
+    const ms = [
+      { lab: "deepseek", slug: "deepseek-v4-pro-0423", name: "DeepSeek V4 Pro" },
+      { lab: "deepseek", slug: "deepseek-v4-pro", name: "DeepSeek V4 Pro" },
+      { lab: "other", slug: "deepseek-v4-pro", name: "DeepSeek V4 Pro" },
+      { lab: "deepseek", slug: "deepseek-v4-pro-exp", name: "deepseek v4 pro" },
+    ];
+    disambiguateNames(ms);
+    expect(ms.map((m) => m.name)).toEqual(["DeepSeek V4 Pro (0423)", "DeepSeek V4 Pro", "DeepSeek V4 Pro", "deepseek v4 pro (exp)"]);
   });
 
   it("picks the consensus name over decorated provider names", () => {

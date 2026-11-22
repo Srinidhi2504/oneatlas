@@ -7,12 +7,13 @@ import { PrismaClient } from "@/generated/prisma/client";
 import { LAB_NAMES, labAlias, titleCase } from "@/lib/labs";
 import { blendedPrice, valueScore } from "@/lib/pricing";
 import { toSearchKey } from "@/lib/search-key";
+import { competitionRanks } from "@/lib/ranking";
 import { joinIds, splitId } from "./join";
 import {
-  competitionRanks,
   mapModelsDevType,
   mapOpenRouterType,
   median,
+  mostCommon,
   modelsDevProviderSchema,
   modelsDevRowSchema,
   normalizeModalities,
@@ -190,7 +191,8 @@ for (const [canonicalId, group] of groups) {
   models.push({
     lab,
     slug,
-    name: p.name,
+    // provider rows decorate names ("GPT-4o (Fast)", "... (EU)"): first-party name, else the consensus name
+    name: group.find((r) => r.providerId === lab)?.name ?? mostCommon(group.map((r) => r.name)),
     description: p.description || group.find((r) => r.description)?.description || or?.description || null,
     type: mapModelsDevType(p.type ?? group.find((r) => r.type)?.type),
     family: p.family ?? null,

@@ -125,14 +125,11 @@ export function median(values: (number | null | undefined)[]): number | null {
   return xs.length % 2 ? xs[mid] : (xs[mid - 1] + xs[mid]) / 2;
 }
 
-/** Competition ranking (1, 2, 2, 4) over values, best first. Returns ranks aligned with the input order. */
-export function competitionRanks(values: number[], higherIsBetter = true): number[] {
-  const sorted = [...values].sort((a, b) => (higherIsBetter ? b - a : a - b));
-  const firstIndex = new Map<number, number>();
-  sorted.forEach((v, i) => {
-    if (!firstIndex.has(v)) firstIndex.set(v, i + 1);
-  });
-  return values.map((v) => firstIndex.get(v)!);
+/** Most frequent string; ties go to the shortest, then alphabetical (deterministic). */
+export function mostCommon(values: string[]): string {
+  const counts = new Map<string, number>();
+  for (const v of values) counts.set(v, (counts.get(v) ?? 0) + 1);
+  return [...counts].sort((a, b) => b[1] - a[1] || a[0].length - b[0].length || a[0].localeCompare(b[0]))[0][0];
 }
 
 /** "Thinking Machines: Inkling 2 Mini" -> { lab: "Thinking Machines", model: "Inkling 2 Mini" } */

@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
+import { competitionRanks } from "@/lib/ranking";
 import { toSearchKey } from "@/lib/search-key";
 import {
-  competitionRanks,
   mapModelsDevType,
   mapOpenRouterType,
   median,
+  mostCommon,
   modelsDevRowSchema,
   normalizeModalities,
   orPriceToPerMillion,
@@ -58,6 +59,11 @@ describe("normalisers", () => {
     expect(median([null])).toBeNull();
     expect(competitionRanks([50, 70, 70, 10])).toEqual([3, 1, 1, 4]);
     expect(competitionRanks([5, 1, 3], false)).toEqual([3, 1, 2]);
+  });
+
+  it("picks the consensus name over decorated provider names", () => {
+    expect(mostCommon(["GPT-4o (Fast)", "GPT-4o", "OpenAI GPT-4o", "GPT-4o"])).toBe("GPT-4o");
+    expect(mostCommon(["DeepSeek-V4-Pro", "DeepSeek V4 Pro"])).toBe("DeepSeek V4 Pro");
   });
 
   it("splits OpenRouter display names", () => {

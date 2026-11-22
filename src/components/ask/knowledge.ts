@@ -14,7 +14,7 @@ export interface PreparedAnswer {
   related: string[];
 }
 
-export const KNOWLEDGE: PreparedAnswer[] = [
+const ENTRIES: PreparedAnswer[] = [
   {
     id: "overview",
     question: "What is OneAtlas, and what can I do with it?",
@@ -452,7 +452,253 @@ Each of these is a row in the decision log, which is the part of the repo I woul
 What I would not add: accounts, a playground or admin editing. They are out of scope for a discovery product and add risk without helping the core job of choosing a model.`,
     related: ["scale", "local-llm", "overview"],
   },
+  {
+    id: "schema",
+    question: "How is the database schema designed, and why those columns and indexes?",
+    keywords: ["schema", "database design", "prisma schema", "tables", "columns", "indexes", "index", "data model", "er diagram", "postgres design"],
+    steps: ["Read prisma/schema.prisma", "Read docs/04-data-model-and-ingestion.md", "Searched for “@@index”"],
+    answer: `Six tables, each mapping to one real-world thing: **Lab → Model ← ProviderModel → Provider**, plus **Benchmark ← BenchmarkScore → Model** ({{prisma/schema.prisma|model Model {}}).
+
+## Decisions worth knowing
+- **One row per model, one row per listing.** A model like Claude Opus 5.5 has one \`Model\` row and 72 \`ProviderModel\` rows, each with that provider's own id, prices and limits. Uniqueness is enforced by the database, not by code: \`(labId, slug)\` for models and \`(providerId, providerModelId)\` for listings ({{prisma/schema.prisma|@@unique([labId, slug])}}).
+- **Capabilities are booleans** (\`reasoning\`, \`toolCall\`, \`vision\`, ...), so a filter is a plain indexed \`WHERE\`, never a JSON lookup ({{prisma/schema.prisma|reasoning        Boolean @default(false)}}).
+- **Modalities are \`String[]\`**, which Postgres can filter with "has any of" in one condition ({{prisma/schema.prisma|inputModalities  String[]}}).
+- **Money is \`Decimal(12,6)\`**: exact, and wide enough for sub-cent prices.
+- **Hot columns are denormalised on purpose**: \`providerCount\`, \`blendedPrice\`, \`intelligenceIndex\` and \`valueScore\` are computed at ingest so every sort is one indexed column ({{prisma/schema.prisma|valueScore        Float?}}). The source of truth stays in the listings and scores tables.
+- **Benchmark ranks are precomputed** at ingest, so "#3 of 123" is a column read, not a window function per request ({{prisma/schema.prisma|rank        Int}}).
+
+## Indexes
+One per sortable column (descending where the default sort is descending), \`labId\` and \`type\` for filters, and a hand-written **GIN trigram index** on \`searchKey\` for search. Listings and scores cascade-delete with their model, so the seed can replace them safely.`,
+    related: ["data-join", "seed", "search"],
+  },
+  {
+    id: "rendering",
+    question: "How are pages rendered: what is prerendered, what streams, and why is it fast?",
+    keywords: ["render", "rendering", "ssr", "prerender", "static", "streaming", "suspense", "ppr", "partial prerendering", "generatestaticparams", "fast", "server components"],
+    steps: ["Read next.config.ts", "Read src/app/page.tsx", "Read src/app/models/[lab]/[slug]/page.tsx", "Searched for “generateStaticParams”"],
+    answer: `Next.js 16 with **Cache Components** turns each page into a static shell plus streamed holes ({{next.config.ts|cacheComponents: true}}).
+
+1. **Static shell, served instantly.** Everything that does not depend on the URL is prerendered at build time: header, footer, headings, the hero and the stats strip (their data comes from cached service calls).
+2. **URL-dependent parts stream in.** Anything reading \`searchParams\` or \`params\` sits inside \`<Suspense>\` with a skeleton of the same size, so nothing jumps when it arrives ({{src/app/page.tsx|<Suspense fallback={<ExplorerSkeleton />}}}).
+3. **Popular pages are fully prerendered.** \`generateStaticParams\` returns the 50 most-served models, labs and providers plus every leaderboard; everything else renders on first visit and is then cached ({{src/app/models/[lab]/[slug]/page.tsx|export async function generateStaticParams}}). The build produces about 220 pages.
+4. **Client JavaScript only where needed.** Lists, filters and the palette are client islands. Tables of data, model pages and directories are server-rendered HTML; the chart library loads only when its section is near the viewport.
+
+## Rules learned the hard way
+- Reading the URL **outside** \`<Suspense>\` is not allowed under this model. It even applies to a nav highlight in the layout, which is why that sits in its own boundary ({{src/components/layout/SiteChrome.tsx|<Suspense fallback={<NavList />}}}).
+- Measured with Lighthouse on mobile: about 90 performance with layout shift at 0 on the main pages.`,
+    related: ["caching", "request-flow", "reliability"],
+  },
+  {
+    id: "security",
+    question: "How is the app secured?",
+    keywords: ["security", "secure", "secrets", "sql injection", "injection", "auth", "authentication", "xss", "abuse", "safe", "vulnerab", "env"],
+    steps: ["Read src/lib/schemas.ts", "Read src/app/api/internal/revalidate/route.ts", "Read scripts/build-code-index.ts", "Searched for “$queryRaw”"],
+    answer: `The biggest security decision is scope: **the public API is read-only and has no accounts**, so there is no user data to leak and nothing to write. On top of that:
+
+- **Every input is validated and bounded** with Zod: page sizes capped at 100, enums checked, slugs restricted to \`a-z0-9._-\` ({{src/lib/schemas.ts|export const slugSchema}}). Unknown parameters are ignored.
+- **No SQL string building.** Queries go through Prisma; the few raw queries use tagged templates, so values are sent as parameters, never pasted into SQL ({{src/server/services/directory.ts|WHERE m."labId" =}}).
+- **No internals in errors.** Database messages never reach clients; a 500 carries only a request id.
+- **The one privileged endpoint** (cache revalidation) needs a bearer secret, compared in constant time, and answers 404 to wrong or missing tokens so it does not reveal itself ({{src/app/api/internal/revalidate/route.ts|timingSafeEqual(given, expected)}}).
+- **The code snapshot never contains secrets.** An allow-list picks folders and an explicit rule excludes \`.env\` files ({{scripts/build-code-index.ts|const EXCLUDE}}); the viewer and assistant look paths up in that snapshot, never on disk ({{src/server/code-index.ts|never resolved on disk}}).
+- **Cost abuse is limited**: the only endpoint that can spend money (Live assistant) is rate-limited per client and off unless a key is configured.
+- **Secrets live only in \`.env\`** (gitignored) and the hosting provider's settings.
+
+**Not done yet**, and named honestly: rate limiting at the edge for the read API, and a Content Security Policy header.`,
+    related: ["errors", "assistant", "deploy"],
+  },
+  {
+    id: "state-management",
+    question: "Why TanStack Query and nuqs instead of Redux or another global store?",
+    keywords: ["state management", "redux", "zustand", "tanstack query", "react query", "global store", "client state", "store", "context"],
+    steps: ["Read src/components/providers.tsx", "Read src/lib/compare-store.ts", "Read src/components/explorer/Explorer.tsx"],
+    answer: `Most "state" in this app is one of two things, and each has a tool built for it:
+
+1. **Server data** (models, facets, rankings) is cached server data, not app state. **TanStack Query** owns it: request de-duplication, caching by query key, retries for network errors (never for 4xx), and \`keepPreviousData\` for smooth filter changes ({{src/components/providers.tsx|new QueryClient}}). Catalog data only changes at ingest, so results stay fresh for 5 minutes ({{src/components/providers.tsx|staleTime: 5 * 60_000}}).
+2. **View state** (filters, sort, page, view, the compared models) belongs in the **URL**, so it survives refresh, sharing and the back button. **nuqs** gives typed, parsed URL parameters with a \`useState\`-like API, and the same parsers run on the server.
+
+What remains is tiny and local:
+- The **compare tray** is a 60-line store on \`useSyncExternalStore\` with \`localStorage\` persistence, shared by the checkboxes, the tray and the header badge ({{src/lib/compare-store.ts|useSyncExternalStore(subscribe, read}}).
+- Component state (an open dialog, a search box draft) stays in \`useState\`.
+
+A Redux or Zustand store would duplicate what the URL and the query cache already hold, and keeping two copies in sync is where bugs come from.`,
+    related: ["url-state", "request-flow", "compare"],
+  },
+  {
+    id: "facets",
+    question: "How do the filter counts next to each lab, provider and chip work?",
+    keywords: ["facet", "facets", "filter counts", "counts", "numbers next to", "chip counts", "how many models", "sidebar counts"],
+    steps: ["Read src/server/services/catalog.ts", "Read src/server/model-where.ts"],
+    answer: `The number next to each option answers one question: **"how many models would I get if I changed this filter, keeping all the others?"**
+
+\`getFacets\` builds that from the same filter object the list uses ({{src/server/services/catalog.ts|export async function getFacets}}):
+- **Lab counts** use every active filter **except the lab filter**, so picking OpenAI does not make every other lab show 0. The helper \`without()\` drops one filter key ({{src/server/model-where.ts|export const without}}). Providers and types work the same way.
+- **Capability chips** show what you would get if you **added** that capability to the current filters, because capabilities combine with AND.
+- **Provider counts** count distinct models, not listings (Bedrock lists some models under several regional ids).
+- **Ranges** (largest context, highest price) ignore the range filters themselves.
+
+About 15 small queries run in parallel, and the whole result is cached per filter combination, so the second visitor with the same filters gets it instantly. The trade-off is marked in the code: one SQL query with \`GROUPING SETS\` would replace them at larger scale.
+
+In the UI, options with a count of 0 are disabled (unless already selected), selected options stay pinned at the top even if their count drops, and the provider list shows the top 50 with a filter box.`,
+    related: ["request-flow", "url-state", "scale"],
+  },
+  {
+    id: "deploy",
+    question: "How is the app deployed, and what does production need?",
+    keywords: ["deploy", "deployment", "vercel", "neon", "production", "hosting", "env vars", "environment variables", "build command", "migrations", "ci"],
+    steps: ["Read docs/08-deploy-and-submission.md", "Read package.json", "Read prisma7.config.ts"],
+    answer: `The target is **Vercel for the app and Neon for Postgres**: one repository, one deployment, managed database.
+
+## What production needs
+| Setting | Purpose |
+|---|---|
+| \`DATABASE_URL\` | Neon **pooled** connection, used by the app at runtime and during the build |
+| \`DIRECT_URL\` | Direct connection for the Prisma CLI (migrations) |
+| \`REVALIDATE_SECRET\` | Optional: enables the cache-clearing endpoint after a re-seed |
+| \`ANTHROPIC_API_KEY\` | Optional: turns on Live mode in this assistant |
+
+## How a deploy works
+1. \`npm install\` runs \`postinstall\`, which generates the Prisma client and the code snapshot ({{package.json|"postinstall"}}).
+2. The build queries the database: it prerenders about 220 pages from cached service reads, which is why \`DATABASE_URL\` must exist at build time.
+3. Migrations run separately with \`npm run db:deploy\` (or in the build command if preferred); the CLI reads \`DIRECT_URL\` from one config file ({{prisma7.config.ts|DIRECT_URL}}).
+4. Seeding production is the same \`npm run db:seed\` pointed at the production database, then one call to the revalidate endpoint.
+
+## Why it holds up on serverless
+Each function instance keeps one Prisma client with a **small pool of five connections** ({{src/lib/db.ts|max: 5}}), Neon's pooler absorbs many instances, and connection errors are retried. Static pages are served from the CDN, and API responses carry CDN cache headers.`,
+    related: ["security", "reliability", "caching"],
+  },
+  {
+    id: "code-viewer",
+    question: "How is the source code viewer (the /code page) built?",
+    keywords: ["code viewer", "code editor", "/code", "source code", "view the code", "browse code", "syntax highlight", "highlighting", "file tree", "editor"],
+    steps: ["Read src/components/code/CodeExplorer.tsx", "Read src/components/code/highlight.ts", "Read src/app/api/v1/code/file/route.ts"],
+    answer: `The **Code** page shows the entire repository in an editor-style viewer: file tree, tabs, syntax highlighting, line numbers, search across files and \`Ctrl+P\` to jump to a file. It reuses the same build-time snapshot as this assistant, so what you read is exactly what is deployed.
+
+1. **Data.** The page ships only the file list (paths, line counts, one-line purpose). File contents load on demand from \`/api/v1/code/file\`, validated with Zod and served from the snapshot, 404 for anything outside it ({{src/app/api/v1/code/file/route.ts|export const GET}}). Search goes through \`/api/v1/code/search\`, the same engine the assistant's \`search_code\` tool uses.
+2. **The tree** is built from flat paths into folders-first, alphabetical nodes ({{src/components/code/tree.ts|export function buildTree}}), with coloured badges per file type.
+3. **Highlighting** is a small built-in tokenizer: one regular expression per language (TypeScript/TSX, CSS, JSON, SQL, Prisma, Markdown), run over the whole file and split into lines, so block comments and template strings keep their colour across lines ({{src/components/code/highlight.ts|export function highlight}}). It has its own tests and no dependency.
+4. **Shareable state.** The open file and line live in the URL (\`/code?path=src/lib/db.ts&line=14\`); click a line number to select it and copy the link ({{src/components/code/CodeExplorer.tsx|export function CodeExplorer}}).
+5. **Connected to this panel.** Every citation's source view has an **Open in editor** link that jumps to that file and line.
+
+On phones the tree becomes a drawer, and the status bar shows the language, line count and the selected line.`,
+    related: ["assistant", "security", "ui-3d"],
+  },
+  {
+    id: "design-system",
+    question: "How is the design system built: colours, type, spacing and dark mode?",
+    keywords: ["design system", "colors", "colours", "color", "palette", "dark mode", "theme", "typography", "font", "tokens", "tailwind", "light mode"],
+    steps: ["Read src/app/globals.css", "Read src/lib/tones.ts", "Read src/components/layout/theme.ts"],
+    answer: `Everything visual comes from a small set of **tokens** in one CSS file, exposed to Tailwind 4 ({{src/app/globals.css|@theme inline {}}).
+
+## Colour
+- **Neutrals**: background, surface, border, text, muted and faint, each defined for light and dark.
+- **One brand accent**, a deep teal that matches the globe logo.
+- **A six-hue data palette** (blue, violet, amber, coral, green, rose), each with a soft background. Colour carries **meaning, not decoration**: one hue per capability, model type and benchmark family, used everywhere that thing appears ({{src/lib/tones.ts|export const CAPABILITY_TONE}}). Reasoning is always violet, tool calling amber, vision coral.
+- Every text colour was checked at **5:1 contrast or better** on its background in both themes, and colour is never the only signal (labels always accompany it).
+- **Lab avatars** get a stable hue from a hash of the lab's slug, so a lab keeps its colour on every page ({{src/components/ui/primitives.tsx|export function labHue}}).
+
+## Dark mode with no flash
+The default follows the system setting. A toggle stores light or dark in \`localStorage\`, and a tiny script runs in \`<head>\` **before the first paint** to apply it, so the page never flashes the wrong theme ({{src/components/layout/theme.ts|export const themeInitScript}}). Each colour token is redefined under the dark theme, so components never need theme logic.
+
+## Type and spacing
+Geist for text and Geist Mono for code and identifiers; a compact scale (12, 13, 14, 16, 20, 28 px) for a data-dense tool; \`tabular-nums\` on everything so numbers line up in columns; an 8 px spacing grid; two radii (controls and panels); hairline borders instead of shadows.`,
+    related: ["ui-3d", "accessibility", "code-viewer"],
+  },
+  {
+    id: "palette",
+    question: "How does the Ctrl+K command palette work?",
+    keywords: ["command palette", "ctrl k", "cmd k", "palette", "global search", "keyboard shortcut", "shortcuts", "quick search"],
+    steps: ["Read src/components/layout/CommandPalette.tsx", "Read src/components/layout/HeaderActions.tsx", "Read src/server/services/catalog.ts"],
+    answer: `Press \`Ctrl+K\` (or \`Cmd+K\`) anywhere to search models, labs and providers at once.
+
+1. **The shortcut** is a single window listener in the header that toggles the palette ({{src/components/layout/HeaderActions.tsx|e.key.toLowerCase() === "k"}}).
+2. **The dialog** uses Radix Dialog for focus trapping, Escape and a labelled title, with **cmdk** inside for the listbox and arrow-key navigation ({{src/components/layout/CommandPalette.tsx|export function CommandPalette}}). Nothing accessibility-critical is hand-rolled.
+3. **Search** is debounced 150 ms and calls \`/api/v1/search\`, which returns models ranked with the same relevance rules as the explorer, plus matching labs and providers with their model counts ({{src/server/services/catalog.ts|export async function search(}}). TanStack Query caches each query, so retyping is instant.
+4. **Empty state** lists quick links to every section, including this assistant.
+5. **Typing a question** adds an "Ask the code" item that opens this panel with your text as the question.
+
+Results are announced to screen readers ("8 results"), and the footer reminds you of the keys. On the Code page, \`Ctrl+P\` opens a separate file finder built the same way.`,
+    related: ["search", "accessibility", "code-viewer"],
+  },
+  {
+    id: "extend",
+    question: "How would you add a new data source or a new field to the catalog?",
+    keywords: ["add a field", "new field", "new data source", "extend", "add a column", "new source", "add data", "artificial analysis api", "extensible"],
+    steps: ["Read scripts/ingest/normalize.ts", "Read scripts/ingest/seed.ts", "Read prisma/schema.prisma", "Read src/lib/types.ts"],
+    answer: `Data flows through a fixed pipeline, so a new field touches the same five places in order. Say you want a model's **license**:
+
+1. **Validate it at the edge.** Add \`license\` to the source row's Zod schema so bad values are counted and skipped, not stored ({{scripts/ingest/normalize.ts|export const modelsDevRowSchema}}).
+2. **Store it.** Add a nullable column to \`Model\` in the Prisma schema, then \`npm run db:migrate\` creates the migration. Check the generated SQL does not drop the hand-written trigram index.
+3. **Fill it in the seed.** Read it from the chosen primary row (with a fallback if OpenRouter also has it) inside the model upsert ({{scripts/ingest/seed.ts|function primaryRow}}). Re-run the seed: it is idempotent, so this is safe.
+4. **Expose it.** Add it to the DTO type ({{src/lib/types.ts|export interface ModelListItem}}) and the mapper. If it should be filterable, add a Zod parameter and one line to the where-builder, with a test.
+5. **Show it.** A column, a spec row or a filter chip; the shared components already handle empty and unknown values.
+
+**A new source** (for example the Artificial Analysis API for coding scores) follows the same path one level up: a fetch step writing a snapshot file, a Zod schema for its rows, and a join step. Joining by the existing canonical id keeps it simple, and the seed's report shows matched and unmatched counts so you know the join worked before shipping.`,
+    related: ["data-join", "schema", "seed"],
+  },
+  {
+    id: "ai-usage",
+    question: "How were AI coding tools used to build this, and how was their output checked?",
+    keywords: ["ai tools", "ai generated", "claude code", "copilot", "chatgpt", "generated code", "how was this built", "verify ai", "ai assisted", "used ai", "use ai", "ai to write", "written by ai", "ai write"],
+    steps: ["Read CLAUDE.md", "Read docs/03-architecture.md decision log", "Read scripts/ingest/join.test.ts"],
+    answer: `The project was built with an AI coding assistant (Claude Code) working from a written plan, with every step checked by things that do not trust the AI: tests, the type checker, real builds, screenshots and Lighthouse.
+
+## How the work was set up
+- **A contract first.** \`CLAUDE.md\` and \`docs/01\` to \`docs/08\` define the stack, the API contract, the data rules and a "definition of done" that every task must pass: typecheck, lint, tests, build, and UI checks at 375 and 1280 px ({{CLAUDE.md|Definition of done}}).
+- **One roadmap task at a time**, one commit per task, and every deviation from the plan written into the decision log with its reason.
+
+## Examples where the AI's first answer was wrong, and what caught it
+1. **Baseline numbers in my own plan were wrong.** The join test, run on the real snapshot, gave 350 keys instead of 357: the plan had counted seven router ids as models. The test now pins the corrected numbers ({{scripts/ingest/join.test.ts|reproduces the baseline join numbers}}).
+2. **A sanity check that could never pass** (150 models with an intelligence score, when the data has 65) was corrected and logged rather than "fixed" by bending the data.
+3. **A generated migration** tried to drop the hand-written search index; reading the SQL before applying it caught it.
+4. **Production-only failures** (a 500 on on-demand pages, layout shift from a select, a crash in this panel) passed typecheck and build, and were found by screenshots and Lighthouse runs.
+
+The rule throughout: generated code is a proposal; a test, a measurement or a reading of the diff decides whether it stays.`,
+    related: ["testing", "hardest-bugs", "reliability"],
+  },
 ];
+
+/** Display and matching order: most important first. Every entry appears exactly once (tested). */
+const ORDER = [
+  "overview",
+  "request-flow",
+  "architecture",
+  "data-join",
+  "schema",
+  "rendering",
+  "assistant",
+  "caching",
+  "search",
+  "seed",
+  "rankings",
+  "pricing",
+  "errors",
+  "security",
+  "url-state",
+  "state-management",
+  "facets",
+  "compare",
+  "reliability",
+  "deploy",
+  "code-viewer",
+  "ui-3d",
+  "design-system",
+  "palette",
+  "scale",
+  "accessibility",
+  "testing",
+  "extend",
+  "local-llm",
+  "ai-usage",
+  "hardest-bugs",
+  "next-steps",
+];
+
+export const KNOWLEDGE: PreparedAnswer[] = ORDER.map((id) => {
+  const entry = ENTRIES.find((e) => e.id === id);
+  if (!entry) throw new Error(`knowledge: unknown id in ORDER: ${id}`);
+  return entry;
+});
+export const UNORDERED = ENTRIES.filter((e) => !ORDER.includes(e.id)).map((e) => e.id);
 
 // ---------- matching a typed question to a prepared answer ----------
 

@@ -13,6 +13,7 @@ Stack: Next.js 16 App Router, React 19, Tailwind 4, TanStack Query 5, nuqs 2. Ad
 | `/benchmarks` | Score matrix; best per column highlighted | `/benchmarks`, `/benchmarks/matrix` |
 | `/labs`, `/labs/[slug]` | Lab directory and lab page | `/labs`, `/labs/{lab}` |
 | `/providers`, `/providers/[slug]` | Provider directory and page | `/providers`, `/providers/{p}` |
+| `/code?path=&line=` | Editor-style source viewer: tree, tabs, search, `Ctrl+P` quick open, line links | `codeTree()` (server), `/code/file`, `/code/search` |
 | `not-found`, `error`, `loading` | Branded states | none |
 
 Header: logo, nav (Models, Rankings, Benchmarks, Labs, Providers), search trigger (`Ctrl/Cmd+K`), Compare badge with count. Footer: data attributions, last-updated.

@@ -9,6 +9,7 @@ export const NAV = [
   { href: "/benchmarks", label: "Benchmarks", match: (p: string) => p.startsWith("/benchmarks") },
   { href: "/labs", label: "Labs", match: (p: string) => p.startsWith("/labs") },
   { href: "/providers", label: "Providers", match: (p: string) => p.startsWith("/providers") },
+  { href: "/code", label: "Code", match: (p: string) => p.startsWith("/code") },
 ];
 
 export function NavLinks({ className, onNavigate }: { className?: string; onNavigate?: () => void }) {

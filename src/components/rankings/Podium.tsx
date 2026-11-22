@@ -1,6 +1,7 @@
 // Top three of a leaderboard as a small 3D podium (CSS 3D: a front face plus a top face seen from slightly above).
 import Link from "next/link";
 import { LabAvatar } from "@/components/ui/primitives";
+import { MEDAL, TONE } from "@/lib/tones";
 import type { RankingRow } from "@/lib/types";
 
 const HEIGHT: Record<number, number> = { 1: 104, 2: 78, 3: 58 };
@@ -21,16 +22,26 @@ export function Podium({ rows }: { rows: RankingRow[] }) {
             <span className="text-xs text-muted">{r.valueLabel}</span>
           </Link>
           <div
-            className="relative w-full origin-bottom rounded-t-[6px] border border-b-0 border-[color-mix(in_srgb,var(--accent)_35%,var(--border))] bg-[linear-gradient(to_bottom,var(--accent-soft),var(--bg))]"
-            style={{ height: HEIGHT[r.rank] ?? 56, transformStyle: "preserve-3d", animation: `podium-rise 0.7s cubic-bezier(0.2,0.7,0.2,1) ${0.12 * i}s both` }}
+            className="relative w-full origin-bottom rounded-t-[6px] border border-b-0"
+            style={{
+              height: HEIGHT[r.rank] ?? 56,
+              transformStyle: "preserve-3d",
+              animation: `podium-rise 0.7s cubic-bezier(0.2,0.7,0.2,1) ${0.12 * i}s both`,
+              borderColor: `color-mix(in srgb, ${TONE[MEDAL[r.rank]].color} 40%, var(--border))`,
+              background: `linear-gradient(to bottom, color-mix(in srgb, ${TONE[MEDAL[r.rank]].color} 18%, var(--bg)), var(--bg))`,
+            }}
           >
             {/* top face */}
             <span
               aria-hidden
-              className="absolute inset-x-[-1px] bottom-full h-9 origin-bottom border border-[color-mix(in_srgb,var(--accent)_35%,var(--border))] bg-[color-mix(in_srgb,var(--accent)_22%,var(--bg))]"
-              style={{ transform: "rotateX(62deg)" }}
+              className="absolute inset-x-[-1px] bottom-full h-9 origin-bottom border"
+              style={{
+                transform: "rotateX(62deg)",
+                borderColor: `color-mix(in srgb, ${TONE[MEDAL[r.rank]].color} 40%, var(--border))`,
+                background: `color-mix(in srgb, ${TONE[MEDAL[r.rank]].color} 30%, var(--bg))`,
+              }}
             />
-            <span className="absolute inset-x-0 top-2 text-2xl font-semibold text-accent sm:text-3xl" aria-label={`Rank ${r.rank}`}>
+            <span className={`absolute inset-x-0 top-2 text-2xl font-semibold sm:text-3xl ${TONE[MEDAL[r.rank]].text}`} aria-label={`Rank ${r.rank}`}>
               {r.rank}
             </span>
           </div>

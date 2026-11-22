@@ -49,30 +49,33 @@ export function readFile(files: IndexedFile[], path: string, startLine?: number,
  * how many lines of the file match, so the most relevant file comes first.
  * ponytail: a linear scan of ~450 KB per call (a few ms); add an inverted index if the snapshot grows 100x.
  */
-export function searchCode(files: IndexedFile[], query: string, pathPrefix = ""): string {
+export function searchHits(files: IndexedFile[], query: string, pathPrefix = "", limit = MAX_SEARCH_HITS) {
   const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
-  if (!terms.length) return "Empty query.";
-  const perFile = files
-    .filter((f) => f.path.startsWith(pathPrefix.replace(/^\.?\//, "")))
-    .map((f) => ({
-      path: f.path,
-      hits: f.content
-        .split("\n")
-        .map((text, i) => ({ line: i + 1, text }))
-        .filter(({ text }) => terms.every((t) => text.toLowerCase().includes(t))),
-    }))
-    .filter((f) => f.hits.length)
-    .sort((a, b) => b.hits.length - a.hits.length || a.path.localeCompare(b.path));
-  if (!perFile.length) return `No matches for "${query}". Try fewer or different terms.`;
-  const out: string[] = [];
-  for (const f of perFile) {
-    for (const h of f.hits) {
-      if (out.length >= MAX_SEARCH_HITS) break;
-      out.push(`${f.path}:${h.line}: ${h.text.trim().slice(0, 160)}`);
-    }
-  }
-  const total = perFile.reduce((n, f) => n + f.hits.length, 0);
-  return `${total} matching lines in ${perFile.length} files${total > out.length ? ` (first ${out.length} shown)` : ""}:\n${out.join("\n")}`;
+  const perFile = !terms.length
+    ? []
+    : files
+        .filter((f) => f.path.startsWith(pathPrefix.replace(/^\.?\//, "")))
+        .map((f) => ({
+          path: f.path,
+          hits: f.content
+            .split("\n")
+            .map((text, i) => ({ line: i + 1, text }))
+            .filter(({ text }) => terms.every((t) => text.toLowerCase().includes(t))),
+        }))
+        .filter((f) => f.hits.length)
+        .sort((a, b) => b.hits.length - a.hits.length || a.path.localeCompare(b.path));
+  const hits: { path: string; line: number; text: string }[] = [];
+  for (const f of perFile) for (const h of f.hits) if (hits.length < limit) hits.push({ path: f.path, line: h.line, text: h.text.trim().slice(0, 200) });
+  return { files: perFile.length, total: perFile.reduce((n, f) => n + f.hits.length, 0), hits };
+}
+
+/** The search_code tool's text form of searchHits. */
+export function searchCode(files: IndexedFile[], query: string, pathPrefix = ""): string {
+  if (!query.trim()) return "Empty query.";
+  const { files: fileCount, total, hits } = searchHits(files, query, pathPrefix);
+  if (!hits.length) return `No matches for "${query}". Try fewer or different terms.`;
+  const out = hits.map((h) => `${h.path}:${h.line}: ${h.text.slice(0, 160)}`);
+  return `${total} matching lines in ${fileCount} files${total > out.length ? ` (first ${out.length} shown)` : ""}:\n${out.join("\n")}`;
 }
 
 /** Lines around a citation (`path:42` or `path:42-60`) for the UI's source viewer; ranges are capped at 120 lines. */

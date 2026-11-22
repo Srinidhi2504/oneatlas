@@ -12,6 +12,7 @@ import { CopyLinkButton } from "@/components/ui/CopyLinkButton";
 import { Odometer } from "@/components/ui/Odometer";
 import { Badge, cardGrid, LabAvatar, Panel, SectionTitle, Skeleton, Spec, StateMessage } from "@/components/ui/primitives";
 import { formatDate, formatInteger, formatMonth, formatPrice, formatScore, formatTokens } from "@/lib/format";
+import { TONE, TYPE_TONE } from "@/lib/tones";
 import { CORE_BOARDS, type BenchmarkResult, type ModelDetail } from "@/lib/types";
 import { NotFoundError } from "@/server/errors";
 import { getModel, latestFromLab, topModelIds } from "@/server/services/models";
@@ -93,7 +94,7 @@ async function ModelView({ params }: Pick<PageProps<"/models/[lab]/[slug]">, "pa
                   {m.lab.name}
                 </Link>
               </span>
-              <Badge>{m.type[0].toUpperCase() + m.type.slice(1)}</Badge>
+              <Badge className={`border-transparent ${TONE[TYPE_TONE[m.type]].soft} ${TONE[TYPE_TONE[m.type]].text}`}>{m.type[0].toUpperCase() + m.type.slice(1)}</Badge>
               {m.capabilities.openWeights ? <Badge tone="accent">Open weights</Badge> : null}
               {m.deprecated ? <Badge tone="warning">Deprecated</Badge> : null}
               <span className="font-mono text-xs text-faint">{m.id}</span>
@@ -322,7 +323,7 @@ function ArenaTable({ results }: { results: BenchmarkResult[] }) {
               <td className="px-3 text-right font-medium">{formatScore(b.value, "elo")}</td>
               <td className="px-3 text-right text-muted">{b.winRate != null ? `${b.winRate.toFixed(1)}%` : "N/A"}</td>
               <td className="px-3">
-                <ScoreBar value={b.value} best={b.best} label={`${b.name} Elo relative to best`} />
+                <ScoreBar value={b.value} best={b.best} tone="coral" label={`${b.name} Elo relative to best`} />
               </td>
               <td className="px-4 text-right whitespace-nowrap">
                 #{b.rank} <span className="text-xs text-faint">of {b.ofTotal}</span>

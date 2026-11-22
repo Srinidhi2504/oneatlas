@@ -1,5 +1,5 @@
 import { sourceQuerySchema } from "@/lib/schemas";
-import { sourceExcerpt } from "@/server/explain/assistant";
+import { sourceExcerpt } from "@/server/code-index";
 import { handler, ok, queryOf } from "@/server/http";
 import { NotFoundError } from "@/server/errors";
 

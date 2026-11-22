@@ -13,6 +13,7 @@ import { api } from "@/lib/api";
 import { cn } from "@/lib/cn";
 import { formatInteger } from "@/lib/format";
 import { defaultOrder, type ModelSort } from "@/lib/schemas";
+import { FILTER_TONE, TONE } from "@/lib/tones";
 import type { Capability, Facets, ModelListItem, Paginated } from "@/lib/types";
 import { FilterPanel } from "./FilterPanel";
 import { effectiveSort, explorerParsers, hasActiveFilters, toApiQuery, toFilterQuery, type ExplorerState } from "./state";
@@ -140,7 +141,7 @@ export function Explorer({ initial }: { initial: ExplorerInitial }) {
   return (
     <div className="lg:grid lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-6">
       <aside aria-label="Filters" className="hidden lg:block">
-        <div className="sticky top-20 max-h-[calc(100dvh-6rem)] overflow-y-auto pr-1 pb-8">{filterPanel}</div>
+        <div className="sticky top-20 max-h-[calc(100dvh-6rem)] overflow-x-hidden overflow-y-auto pr-2 pb-8 [scrollbar-gutter:stable]">{filterPanel}</div>
       </aside>
 
       <div className="min-w-0" ref={resultsRef} style={{ scrollMarginTop: 72 }}>
@@ -242,7 +243,9 @@ export function Explorer({ initial }: { initial: ExplorerInitial }) {
                 onClick={() => onChip(chip)}
                 className={cn(
                   "inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border px-3 text-13 transition-colors",
-                  active ? "border-accent bg-accent-soft font-medium text-accent" : "border-border text-muted hover:border-border-strong hover:text-fg",
+                  active
+                    ? cn("font-medium", chip.capability ? [TONE[FILTER_TONE[chip.capability]].soft, TONE[FILTER_TONE[chip.capability]].text, TONE[FILTER_TONE[chip.capability]].border] : "border-accent bg-accent-soft text-accent")
+                    : "border-border text-muted hover:border-border-strong hover:text-fg",
                 )}
               >
                 {chip.label}

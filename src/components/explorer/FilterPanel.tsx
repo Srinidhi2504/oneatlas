@@ -68,7 +68,7 @@ function CheckRow({ option, checked, onToggle }: { option: Option; checked: bool
     <label className={cn("flex h-8 cursor-pointer items-center gap-2.5 rounded-[var(--radius-control)] px-1.5 text-13 hover:bg-surface-2", disabled && "cursor-default opacity-45 hover:bg-transparent")}>
       <input type="checkbox" checked={checked} disabled={disabled} onChange={onToggle} className="size-3.5 shrink-0 accent-[var(--accent)]" />
       <span className="min-w-0 flex-1 truncate">{option.label}</span>
-      <span className="text-xs text-faint">{formatInteger(option.count)}</span>
+      <span className="shrink-0 text-xs text-faint">{formatInteger(option.count)}</span>
     </label>
   );
 }
@@ -85,7 +85,7 @@ function GroupSkeleton() {
 
 function CheckGroup({ legend, options, selected, onToggle, loading }: { legend: string; options: Option[]; selected: string[]; onToggle: (v: string) => void; loading: boolean }) {
   return (
-    <fieldset>
+    <fieldset className="min-w-0">
       <legend className="mb-1.5 text-xs font-medium text-muted">{legend}</legend>
       {loading ? (
         <GroupSkeleton />
@@ -126,7 +126,8 @@ function SearchableGroup({
   const missingSelected = selected.filter((s) => !options.some((o) => o.value === s));
 
   return (
-    <fieldset>
+    // fieldsets default to min-inline-size: min-content, so a long provider name would widen the sidebar
+    <fieldset className="min-w-0">
       <legend className="mb-1.5 text-xs font-medium text-muted">{legend}</legend>
       <div className="relative mb-1">
         <Search className="pointer-events-none absolute top-1/2 left-2 size-3.5 -translate-y-1/2 text-faint" aria-hidden />

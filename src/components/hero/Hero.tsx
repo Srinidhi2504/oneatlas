@@ -32,6 +32,12 @@ export async function Hero() {
         </p>
       </div>
       <div className="relative -mx-4 h-[260px] sm:mx-0 sm:h-[360px] lg:h-[440px]">
+        {/* soft aurora behind the globe: three palette hues, heavily blurred */}
+        <div aria-hidden className="pointer-events-none absolute inset-[12%] opacity-50 blur-3xl">
+          <span className="absolute top-[8%] left-[14%] size-[46%] rounded-full" style={{ background: "color-mix(in srgb, var(--accent) 35%, transparent)" }} />
+          <span className="absolute right-[6%] bottom-[16%] size-[40%] rounded-full" style={{ background: "color-mix(in srgb, var(--c-amber) 30%, transparent)" }} />
+          <span className="absolute bottom-[4%] left-[22%] size-[34%] rounded-full" style={{ background: "color-mix(in srgb, var(--c-violet) 26%, transparent)" }} />
+        </div>
         <AtlasGlobe className="enter absolute inset-0 h-full w-full" />
       </div>
     </section>

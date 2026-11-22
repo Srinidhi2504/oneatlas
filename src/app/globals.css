@@ -24,6 +24,16 @@
   --danger: #b42c22;
   --bar: #0b6e6a;
   --bar-track: #e7ebee;
+  /* data palette: each capability / type / benchmark family has one hue (text >= 5:1 on its soft background) */
+  --c-blue: #1c5bb0; --c-blue-soft: #e8f0fb;
+  --c-violet: #6a3cbc; --c-violet-soft: #f1ebfb;
+  --c-amber: #875400; --c-amber-soft: #fbf0d9;
+  --c-coral: #b03a0b; --c-coral-soft: #fdebe3;
+  --c-green: #16693a; --c-green-soft: #e4f3e9;
+  --c-rose: #ae2257; --c-rose-soft: #fbe8ef;
+  /* syntax colours for the code viewer */
+  --syn-keyword: #c22a4a; --syn-string: #17703d; --syn-number: #1c5bb0; --syn-fn: #6a3cbc;
+  --syn-type: #9a4f00; --syn-tag: #0b6e6a; --syn-comment: #5d6570;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -46,6 +56,14 @@
     --danger: #f2766b;
     --bar: #4cc2b8;
     --bar-track: #222a31;
+    --c-blue: #79b0ff; --c-blue-soft: #152539;
+    --c-violet: #bba4ff; --c-violet-soft: #231d38;
+    --c-amber: #f2b84f; --c-amber-soft: #30260f;
+    --c-coral: #ff8f63; --c-coral-soft: #381e14;
+    --c-green: #5ccb94; --c-green-soft: #122e1f;
+    --c-rose: #ff86b0; --c-rose-soft: #371726;
+    --syn-keyword: #ff7b8a; --syn-string: #7ee0a6; --syn-number: #79b0ff; --syn-fn: #c6b0ff;
+    --syn-type: #ffb066; --syn-tag: #4cc2b8; --syn-comment: #8d97a2;
   }
 }
 
@@ -68,6 +86,14 @@
   --danger: #f2766b;
   --bar: #4cc2b8;
   --bar-track: #222a31;
+    --c-blue: #79b0ff; --c-blue-soft: #152539;
+    --c-violet: #bba4ff; --c-violet-soft: #231d38;
+    --c-amber: #f2b84f; --c-amber-soft: #30260f;
+    --c-coral: #ff8f63; --c-coral-soft: #381e14;
+    --c-green: #5ccb94; --c-green-soft: #122e1f;
+    --c-rose: #ff86b0; --c-rose-soft: #371726;
+    --syn-keyword: #ff7b8a; --syn-string: #7ee0a6; --syn-number: #79b0ff; --syn-fn: #c6b0ff;
+    --syn-type: #ffb066; --syn-tag: #4cc2b8; --syn-comment: #8d97a2;
 }
 
 @theme inline {
@@ -88,6 +114,18 @@
   --color-danger: var(--danger);
   --color-bar: var(--bar);
   --color-bar-track: var(--bar-track);
+  --color-c-blue: var(--c-blue);
+  --color-c-blue-soft: var(--c-blue-soft);
+  --color-c-violet: var(--c-violet);
+  --color-c-violet-soft: var(--c-violet-soft);
+  --color-c-amber: var(--c-amber);
+  --color-c-amber-soft: var(--c-amber-soft);
+  --color-c-coral: var(--c-coral);
+  --color-c-coral-soft: var(--c-coral-soft);
+  --color-c-green: var(--c-green);
+  --color-c-green-soft: var(--c-green-soft);
+  --color-c-rose: var(--c-rose);
+  --color-c-rose-soft: var(--c-rose-soft);
 
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
@@ -264,3 +302,24 @@
 @media (prefers-reduced-motion: reduce) {
   [style*="ask-slide"] { animation: none !important; }
 }
+
+/* syntax highlighting (components/code) */
+.tok-keyword { color: var(--syn-keyword); }
+.tok-string { color: var(--syn-string); }
+.tok-number { color: var(--syn-number); }
+.tok-fn { color: var(--syn-fn); }
+.tok-type { color: var(--syn-type); }
+.tok-tag { color: var(--syn-tag); }
+.tok-attr { color: var(--syn-number); }
+.tok-comment { color: var(--syn-comment); font-style: italic; }
+.tok-punct { color: var(--muted); }
+
+/* lab cards: a thin strip and a faint wash in the lab's own hue */
+.lab-card::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: hsl(var(--h) 60% 50%);
+}
+.lab-card { background-image: linear-gradient(to bottom, hsl(var(--h) 60% 50% / 0.06), transparent 55%); }

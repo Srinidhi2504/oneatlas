@@ -72,6 +72,13 @@ test("explorer filter, detail, compare and rankings", async ({ page }) => {
   expect(consoleErrors).toEqual([]);
 });
 
+test("code viewer opens a deep-linked file at the selected line", async ({ page }) => {
+  await page.goto("/code?path=src/lib/pricing.ts&line=1");
+  const body = page.getByRole("region", { name: "Contents of src/lib/pricing.ts" });
+  await expect(body).toContainText("blended");
+  await expect(page.getByRole("tab", { name: /pricing\.ts/ })).toBeVisible();
+});
+
 test("unknown model renders the branded 404 and the API returns the error envelope", async ({ page, request }) => {
   await page.goto("/models/nope/nothing");
   await expect(page.getByRole("heading", { name: "This page isn’t on the map" })).toBeVisible();

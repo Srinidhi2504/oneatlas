@@ -11,6 +11,7 @@ import { SelectMenu } from "@/components/ui/SelectMenu";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/cn";
 import { formatInteger, formatTokens } from "@/lib/format";
+import { MEDAL, TONE } from "@/lib/tones";
 import { Podium } from "./Podium";
 import { rankingApiQuery, rankingParsers, serializeRankingFilters } from "./state";
 import { CAPABILITIES, MODEL_TYPES, type Capability, type ListMeta, type Rankings } from "@/lib/types";
@@ -179,7 +180,7 @@ export function RankingsView({
                       const bar = barFor(r.value);
                       return (
                         <tr key={r.model.id} className="h-14 border-b border-border last:border-b-0 hover:bg-surface">
-                          <td className={cn("px-3 text-right font-semibold", r.rank <= 3 ? "text-accent" : "text-muted")}>{r.rank}</td>
+                          <td className={cn("px-3 text-right font-semibold", r.rank <= 3 ? TONE[MEDAL[r.rank]].text : "text-muted")}>{r.rank}</td>
                           <th scope="row" className="px-3 text-left font-normal">
                             <span className="flex items-center gap-2.5">
                               <LabAvatar slug={r.model.lab.slug} name={r.model.lab.name} />

@@ -164,3 +164,9 @@ export const sourceQuerySchema = z.object({
   line: z.coerce.number().int().min(1).max(100_000).default(1),
   end: z.coerce.number().int().min(1).max(100_000).optional(),
 });
+
+/** GET /api/v1/code/file */
+export const codeFileQuerySchema = z.object({ path: z.string().min(1).max(300) });
+
+/** GET /api/v1/code/search: all terms must appear on one line */
+export const codeSearchQuerySchema = z.object({ q: z.string().trim().min(2).max(120) });

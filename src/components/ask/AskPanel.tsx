@@ -5,6 +5,7 @@
 //  - Live (when the deployment has ANTHROPIC_API_KEY): Claude reads the code through tools (POST /api/v1/explain).
 import * as Dialog from "@radix-ui/react-dialog";
 import { ArrowLeft, ArrowUp, Check, Copy, List, MessageSquareCode, RotateCcw, Sparkles, Square, TriangleAlert, X, Zap } from "lucide-react";
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { cn } from "@/lib/cn";
 import type { ExplainEvent } from "@/server/explain/assistant";
@@ -408,7 +409,7 @@ export function AskPanel() {
                 </ol>
               )}
             </div>
-            {source ? <SourceViewer source={source} onClose={() => setSource(null)} /> : null}
+            {source ? <SourceViewer source={source} onClose={() => setSource(null)} onLeave={() => setOpen(false)} /> : null}
           </div>
 
           <form
@@ -652,7 +653,7 @@ function AssistantTurn({
   );
 }
 
-function SourceViewer({ source, onClose }: { source: { loading: boolean; error?: string; data?: Source; cite: Citation }; onClose: () => void }) {
+function SourceViewer({ source, onClose, onLeave }: { source: { loading: boolean; error?: string; data?: Source; cite: Citation }; onClose: () => void; onLeave: () => void }) {
   const targetRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     // block body on purpose: newer browsers return a Promise from scrollIntoView, and an effect must return nothing
@@ -670,7 +671,15 @@ function SourceViewer({ source, onClose }: { source: { loading: boolean; error?:
           {source.cite.path}
           {d ? `:${d.target}${source.cite.end && source.cite.end > d.target ? `-${source.cite.end}` : ""}` : ""}
         </span>
-        {d ? <span className="shrink-0 text-[11px] text-faint">{d.totalLines} lines</span> : null}
+        {d ? (
+          <Link
+            href={`/code?path=${encodeURIComponent(source.cite.path)}&line=${d.target}`}
+            onClick={onLeave}
+            className="shrink-0 rounded px-1.5 py-1 text-[11px] font-medium text-accent hover:bg-accent-soft"
+          >
+            Open in editor
+          </Link>
+        ) : null}
       </div>
       <div className="min-h-0 flex-1 overflow-auto">
         {source.loading ? (

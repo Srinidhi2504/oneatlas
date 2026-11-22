@@ -112,6 +112,11 @@ Body `{ messages: [{ role: "user"|"assistant", content }] }` (1 to 20 turns, sta
 `{type:"tool", name, label}` (a step such as "Read src/lib/db.ts"), `{type:"text", text}` (answer delta, Markdown with `path:line` citations), then `{type:"done"}` or `{type:"error", message}`. Needs `ANTHROPIC_API_KEY`; without it the stream carries one `error` event.
 ### `GET /explain/source?path=&line=&end=` -> `{ path, totalLines, start, target, lines[] }` from the bundled code snapshot (404 for paths outside it).
 
+### Code viewer (`/code`), all read from the same build-time snapshot
+- `GET /code` -> `{ path, lines, summary|null }[]`: every file in the snapshot, no contents (the file tree).
+- `GET /code/file?path=` -> `{ path, lines, content }`. 404 `NOT_FOUND` for paths outside the snapshot (no disk access, so no traversal).
+- `GET /code/search?q=` (2 to 120 chars) -> `{ files, total, hits: { path, line, text }[] }`. Every whitespace-separated term must appear on the same line, case-insensitive, at most 60 hits.
+
 ## Implementation notes
 
 - One service function per endpoint in `src/server/services`, `'use cache'` + `cacheLife('hours')` + `cacheTag('catalog')`, input = the parsed Zod object, output = DTOs only (`mappers.ts` converts `Decimal -> number`, `Date -> ISO`).

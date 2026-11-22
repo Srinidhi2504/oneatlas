@@ -5,6 +5,7 @@ import { Badge, LabAvatar, Skeleton } from "@/components/ui/primitives";
 import { cn } from "@/lib/cn";
 import { daysSince, formatDate, formatInteger, formatScore, formatTokens } from "@/lib/format";
 import type { ModelSort } from "@/lib/schemas";
+import { TONE, TYPE_TONE } from "@/lib/tones";
 import type { ModelListItem } from "@/lib/types";
 import { CapabilityIcons, ModalityIcons, PriceCell } from "./bits";
 import { CompareCheckbox } from "./compare";
@@ -154,7 +155,7 @@ function Row({ m, index }: { m: ModelListItem; index: number }) {
               </Link>
               {isNew ? <Badge tone="accent">New</Badge> : null}
               {m.deprecated ? <Badge tone="warning">Deprecated</Badge> : null}
-              {m.type !== "text" ? <Badge>{typeLabel(m.type)}</Badge> : null}
+              {m.type !== "text" ? <Badge className={cn("border-transparent", TONE[TYPE_TONE[m.type]].soft, TONE[TYPE_TONE[m.type]].text)}>{typeLabel(m.type)}</Badge> : null}
             </span>
             <span className="block truncate text-xs text-muted">{m.lab.name}</span>
           </span>

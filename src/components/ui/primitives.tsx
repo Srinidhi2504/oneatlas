@@ -51,17 +51,23 @@ export function Skeleton({ className }: { className?: string }) {
   return <span aria-hidden className={cn("block animate-shimmer rounded-[4px] bg-surface-2", className)} />;
 }
 
-/** Deterministic initials avatar for a lab (no external logos). */
-export function LabAvatar({ slug, name, size = 28, className }: { slug: string; name: string; size?: number; className?: string }) {
+/** Stable hue (0-359) for a lab: avatars and lab cards share it. */
+export function labHue(slug: string) {
   let hash = 0;
   for (const ch of slug) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
+  return hash % 360;
+}
+
+/** Deterministic initials avatar for a lab (no external logos). */
+export function LabAvatar({ slug, name, size = 28, className }: { slug: string; name: string; size?: number; className?: string }) {
+  const hue = labHue(slug);
   const words = name.replace(/[^\p{L}\p{N} ]/gu, " ").split(/\s+/).filter(Boolean);
   const initials = (words.length > 1 ? words[0][0] + words[1][0] : (words[0] ?? slug).slice(0, 2)).toUpperCase();
   return (
     <span
       aria-hidden
       className={cn("avatar inline-flex shrink-0 items-center justify-center rounded-[7px] font-semibold tracking-tight", className)}
-      style={{ ["--h" as string]: hash % 360, width: size, height: size, fontSize: Math.round(size * 0.4) }}
+      style={{ ["--h" as string]: hue, width: size, height: size, fontSize: Math.round(size * 0.4) }}
     >
       {initials}
     </span>

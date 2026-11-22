@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/api/v1/explain": ["./src/generated/code-index.json"],
     "/api/v1/explain/source": ["./src/generated/code-index.json"],
+    "/api/v1/code/**": ["./src/generated/code-index.json"],
+    "/code": ["./src/generated/code-index.json"],
   },
   turbopack: {
     rules: {

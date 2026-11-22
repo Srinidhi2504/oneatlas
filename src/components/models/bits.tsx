@@ -5,6 +5,7 @@ import type { ComponentType } from "react";
 import { Tip } from "@/components/ui/Tip";
 import { cn } from "@/lib/cn";
 import { formatPrice } from "@/lib/format";
+import { CAPABILITY_TONE, TONE, type Tone } from "@/lib/tones";
 import type { Modality, ModelListItem, Pricing } from "@/lib/types";
 
 type Caps = ModelListItem["capabilities"];
@@ -25,7 +26,7 @@ export function CapabilityIcons({ caps }: { caps: Caps }) {
       {CAPABILITY_META.map((c) =>
         caps[c.key] ? (
           <Tip key={c.key} label={c.label}>
-            <span tabIndex={-1} className="inline-flex size-5 items-center justify-center rounded-[4px] bg-accent-soft text-accent" aria-hidden>
+            <span tabIndex={-1} className={cn("inline-flex size-5 items-center justify-center rounded-[4px]", TONE[CAPABILITY_TONE[c.key]].soft, TONE[CAPABILITY_TONE[c.key]].text)} aria-hidden>
               <c.icon className="size-3" />
             </span>
           </Tip>
@@ -46,7 +47,7 @@ export function CapabilityBadges({ caps, limit }: { caps: Caps; limit?: number }
   return (
     <span className="flex flex-wrap gap-1">
       {present.map((c) => (
-        <span key={c.key} className="inline-flex h-5 items-center gap-1 rounded-[4px] bg-accent-soft px-1.5 text-xs font-medium text-accent">
+        <span key={c.key} className={cn("inline-flex h-5 items-center gap-1 rounded-[4px] px-1.5 text-xs font-medium", TONE[CAPABILITY_TONE[c.key]].soft, TONE[CAPABILITY_TONE[c.key]].text)}>
           <c.icon className="size-3" aria-hidden />
           {c.short}
         </span>
@@ -120,7 +121,7 @@ export function PriceCell({ pricing, className }: { pricing: Pricing; className?
  * Relative score bar drawn like a map scale bar: a ticked track with a filled segment.
  * `value / best` sets the length; the number is rendered next to it, so colour is never the only signal.
  */
-export function ScoreBar({ value, best, className, label }: { value: number; best: number; className?: string; label?: string }) {
+export function ScoreBar({ value, best, className, label, tone = "teal" }: { value: number; best: number; className?: string; label?: string; tone?: Tone }) {
   const pct = best > 0 ? Math.max(2, Math.min(100, (value / best) * 100)) : 0;
   return (
     <span
@@ -131,7 +132,7 @@ export function ScoreBar({ value, best, className, label }: { value: number; bes
       aria-label={label}
       className={cn("relative block h-2 w-full overflow-hidden rounded-[2px] bg-bar-track", className)}
     >
-      <span className="bar-fill absolute inset-y-0 left-0 bg-bar transition-[width] duration-500 ease-out" style={{ width: `${pct}%` }} />
+      <span className="bar-fill absolute inset-y-0 left-0 transition-[width] duration-500 ease-out" style={{ width: `${pct}%`, background: TONE[tone].color }} />
       {/* quarter ticks over track and fill */}
       <span className="absolute inset-0 bg-[repeating-linear-gradient(90deg,transparent_0,transparent_calc(25%-1.5px),var(--bg)_calc(25%-1.5px),var(--bg)_25%)]" />
     </span>

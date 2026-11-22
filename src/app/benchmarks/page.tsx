@@ -5,6 +5,7 @@ import { MatrixView, type MatrixPage } from "@/components/benchmarks/MatrixView"
 import { loadMatrixState, matrixApiQuery } from "@/components/benchmarks/state";
 import { PageHeader, Skeleton } from "@/components/ui/primitives";
 import { formatInteger, formatScore } from "@/lib/format";
+import { benchmarkTone, TONE } from "@/lib/tones";
 import { matrixQuerySchema, paramsToObject } from "@/lib/schemas";
 import { getMatrix, listBenchmarks } from "@/server/services/benchmarks";
 import { listLabs } from "@/server/services/directory";
@@ -42,7 +43,8 @@ async function Catalogue() {
     <div className="grid gap-4 lg:grid-cols-2">
       {groups.map((g) => (
         <section key={g} aria-labelledby={`g-${g}`} className="reveal-3d overflow-hidden rounded-[var(--radius-panel)] border border-border">
-          <h2 id={`g-${g}`} className="border-b border-border bg-surface px-4 py-2.5 text-sm">
+          <h2 id={`g-${g}`} className="flex items-center gap-2 border-b border-border bg-surface px-4 py-2.5 text-sm">
+            <span aria-hidden className="size-2 rounded-full" style={{ background: TONE[benchmarkTone(g)].color }} />
             {g}
             <span className="ml-2 text-xs font-normal text-muted">{all.filter((b) => b.group === g).length} benchmarks</span>
           </h2>

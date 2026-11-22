@@ -2,7 +2,7 @@
 import { ExternalLink, SearchX } from "lucide-react";
 import Link from "next/link";
 import { parseAsString, parseAsStringLiteral, useQueryStates } from "nuqs";
-import { Badge, Button, LabAvatar, Panel, StateMessage } from "@/components/ui/primitives";
+import { Badge, Button, LabAvatar, labHue, Panel, StateMessage } from "@/components/ui/primitives";
 import { Tilt } from "@/components/ui/Tilt";
 import { SelectMenu } from "@/components/ui/SelectMenu";
 import { formatDate, formatInteger, plural } from "@/lib/format";
@@ -69,7 +69,11 @@ export function LabsDirectory({ labs }: { labs: LabSummary[] }) {
           {shown.map((l) => (
             <li key={l.slug} className="reveal-3d">
               <Tilt className="h-full rounded-[var(--radius-panel)]">
-              <Link href={`/labs/${l.slug}`} className="flex h-full flex-col rounded-[var(--radius-panel)] border border-border bg-bg p-4 transition-colors hover:border-border-strong">
+              <Link
+                href={`/labs/${l.slug}`}
+                style={{ ["--h" as string]: labHue(l.slug) }}
+                className="lab-card relative flex h-full flex-col overflow-hidden rounded-[var(--radius-panel)] border border-border bg-bg p-4 transition-colors hover:border-border-strong"
+              >
                 <span className="flex items-center gap-3">
                   <LabAvatar slug={l.slug} name={l.name} size={36} />
                   <span className="min-w-0">

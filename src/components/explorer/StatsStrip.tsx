@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Odometer } from "@/components/ui/Odometer";
 import { formatInteger } from "@/lib/format";
+import { TONE, type Tone } from "@/lib/tones";
 import { getStats } from "@/server/services/catalog";
 
 /** Catalog size + capability coverage. Cached server read: part of the static shell, no client JS. */
@@ -13,11 +14,11 @@ export async function StatsStrip() {
     { label: "API listings", value: s.listings, href: "/providers" },
   ];
   const coverage = [
-    { label: "Tool calling", share: s.coverage.toolCall },
-    { label: "Reasoning", share: s.coverage.reasoning },
-    { label: "Vision", share: s.coverage.vision },
-    { label: "Open weights", share: s.coverage.openWeights },
-  ];
+    { label: "Tool calling", share: s.coverage.toolCall, tone: "amber" },
+    { label: "Reasoning", share: s.coverage.reasoning, tone: "violet" },
+    { label: "Vision", share: s.coverage.vision, tone: "coral" },
+    { label: "Open weights", share: s.coverage.openWeights, tone: "green" },
+  ] satisfies { label: string; share: number; tone: Tone }[];
   return (
     <section aria-label="Catalog overview" className="enter grid overflow-hidden rounded-[var(--radius-panel)] border border-border lg:grid-cols-[auto_1fr]">
       <dl className="grid grid-cols-2 sm:grid-cols-4">
@@ -37,11 +38,11 @@ export async function StatsStrip() {
           <div key={c.label}>
             <dt className="flex items-baseline justify-between text-xs text-muted">
               {c.label}
-              <span className="font-medium text-fg">{Math.round(c.share * 100)}%</span>
+              <span className={`font-medium ${TONE[c.tone].text}`}>{Math.round(c.share * 100)}%</span>
             </dt>
             <dd className="mt-1.5">
               <span role="meter" aria-label={`${c.label} coverage`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(c.share * 100)} className="relative block h-1.5 overflow-hidden rounded-[2px] bg-bar-track">
-                <span className="bar-fill absolute inset-y-0 left-0 bg-bar" style={{ width: `${c.share * 100}%` }} />
+                <span className="bar-fill absolute inset-y-0 left-0" style={{ width: `${c.share * 100}%`, background: TONE[c.tone].color }} />
               </span>
             </dd>
           </div>

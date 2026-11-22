@@ -1,10 +1,9 @@
 // "Ask the code": Claude explains this codebase by reading it. A bounded, streaming tool loop over the code index:
 // the model searches and reads files (read-only, in-memory), then answers with `path:line` citations.
 import Anthropic from "@anthropic-ai/sdk";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { z } from "zod";
-import { listFiles, projectMap, readFile, searchCode, sourceWindow, type IndexedFile } from "./code-tools";
+import { codeIndex } from "../code-index";
+import { listFiles, projectMap, readFile, searchCode, type IndexedFile } from "./code-tools";
 
 const MODEL = "claude-opus-5-5";
 const MAX_ROUNDS = 6; // tool rounds per question; the last round must answer (tool_choice "none")
@@ -20,19 +19,6 @@ export interface ChatTurn {
   role: "user" | "assistant";
   content: string;
 }
-
-// ---------- code index (built by scripts/build-code-index.ts, traced into the deployment via next.config.ts) ----------
-
-let cachedFiles: IndexedFile[] | null = null;
-export function codeIndex(): IndexedFile[] {
-  if (!cachedFiles) {
-    const raw = readFileSync(join(process.cwd(), "src/generated/code-index.json"), "utf8");
-    cachedFiles = (JSON.parse(raw) as { files: IndexedFile[] }).files;
-  }
-  return cachedFiles;
-}
-
-export const sourceExcerpt = (path: string, line: number, end?: number) => sourceWindow(codeIndex(), path, line, 12, end);
 
 // ---------- prompt (byte-stable: no dates or ids, so tools + system are served from the prompt cache) ----------
 

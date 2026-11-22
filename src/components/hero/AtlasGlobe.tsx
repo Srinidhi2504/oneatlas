@@ -53,10 +53,12 @@ export function AtlasGlobe({ className }: { className?: string }) {
     const hubs = HUBS.map(([la, lo]) => toVec(la, lo));
     const arcs = ARCS.map(([a, b]) => arcPoints(hubs[a], hubs[b]));
 
-    let colors = { dot: "#888", accent: "#0b6e6a", rim: "#ccc" };
+    let colors = { dot: "#888", accent: "#0b6e6a", rim: "#ccc", palette: ["#0b6e6a"] };
     const readColors = () => {
       const cs = getComputedStyle(document.documentElement);
-      colors = { dot: cs.getPropertyValue("--faint").trim(), accent: cs.getPropertyValue("--accent").trim(), rim: cs.getPropertyValue("--border-strong").trim() };
+      const v = (name: string) => cs.getPropertyValue(name).trim();
+      // hubs and arcs cycle through the data palette, so the globe carries the same colours as the rest of the UI
+      colors = { dot: v("--faint"), accent: v("--accent"), rim: v("--border-strong"), palette: ["--accent", "--c-amber", "--c-violet", "--c-coral", "--c-blue", "--c-green"].map(v) };
     };
     readColors();
 
@@ -119,9 +121,10 @@ export function AtlasGlobe({ className }: { className?: string }) {
       }
 
       // arcs with a travelling pulse
-      ctx.strokeStyle = colors.accent;
-      ctx.fillStyle = colors.accent;
       arcs.forEach((pts, ai) => {
+        const color = colors.palette[ai % colors.palette.length];
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
         const proj = pts.map((v) => project(v, R, cx, cy));
         ctx.lineWidth = 1.2;
         for (let i = 1; i < proj.length; i++) {
@@ -147,6 +150,7 @@ export function AtlasGlobe({ className }: { className?: string }) {
         const p = project(v, R, cx, cy);
         if (p.z < -0.05) return;
         const pulse = (Math.sin(time * 0.05 + i) + 1) / 2;
+        ctx.fillStyle = colors.palette[i % colors.palette.length];
         ctx.globalAlpha = 0.25 * (1 - pulse) * (0.4 + p.z);
         ctx.beginPath();
         ctx.arc(p.x, p.y, 4 + pulse * 7, 0, Math.PI * 2);

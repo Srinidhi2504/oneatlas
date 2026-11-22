@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { parseBlocks } from "./Markdown";
-import { KNOWLEDGE, matchQuestion, resolveAnchors, suggestQuestions } from "./knowledge";
+import { KNOWLEDGE, matchQuestion, resolveAnchors, suggestQuestions, UNORDERED } from "./knowledge";
 
 const id = (q: string) => matchQuestion(q)?.entry.id ?? null;
 
@@ -8,7 +8,8 @@ describe("prepared answers", () => {
   it("is a well-formed, prioritised set", () => {
     const ids = KNOWLEDGE.map((k) => k.id);
     expect(new Set(ids).size).toBe(ids.length);
-    expect(KNOWLEDGE.length).toBeGreaterThanOrEqual(20);
+    expect(KNOWLEDGE.length).toBeGreaterThanOrEqual(30);
+    expect(UNORDERED).toEqual([]); // every prepared answer has a place in the priority order
     expect(ids[0]).toBe("overview");
     for (const k of KNOWLEDGE) {
       for (const r of k.related) expect(ids, `${k.id} -> ${r}`).toContain(r);
@@ -28,6 +29,17 @@ describe("prepared answers", () => {
     expect(id("how is the 3d globe made")).toBe("ui-3d");
     expect(id("what breaks at 100x")).toBe("scale");
     expect(id("is the seed idempotent")).toBe("seed");
+    expect(id("how is the database schema designed")).toBe("schema");
+    expect(id("is it secure against sql injection")).toBe("security");
+    expect(id("why not redux")).toBe("state-management");
+    expect(id("how do I deploy this to vercel")).toBe("deploy");
+    expect(id("how does the code editor work")).toBe("code-viewer");
+    expect(id("how does dark mode work")).toBe("design-system");
+    expect(id("how does ctrl k work")).toBe("palette");
+    expect(id("what are the numbers next to each lab filter")).toBe("facets");
+    expect(id("did you use ai to write this")).toBe("ai-usage");
+    expect(id("how would I add a new field")).toBe("extend");
+    expect(id("what is prerendered and what streams")).toBe("rendering");
     expect(id("bananas and weather")).toBeNull();
   });
 

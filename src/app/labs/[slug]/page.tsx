@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { LabModels } from "@/components/directory/LabModels";
+import { Odometer } from "@/components/ui/Odometer";
 import { LabAvatar, SectionTitle, Skeleton } from "@/components/ui/primitives";
 import { formatDate, formatInteger } from "@/lib/format";
 import type { LabDetail } from "@/lib/types";
@@ -65,20 +66,22 @@ async function LabView({ params }: Pick<PageProps<"/labs/[slug]">, "params">) {
       </nav>
       <header className="flex items-center gap-3.5 pt-4 pb-6">
         <LabAvatar slug={lab.slug} name={lab.name} size={44} />
-        <h1 className="text-[28px] leading-9">{lab.name}</h1>
+        <h1 className="enter text-[28px] leading-9">{lab.name}</h1>
       </header>
 
       <dl className="grid grid-cols-2 overflow-hidden rounded-[var(--radius-panel)] border border-border sm:grid-cols-3 lg:grid-cols-5">
         {tiles.map(([label, value]) => (
           <div key={label} className="-mt-px -ml-px border-t border-l border-border px-4 py-3">
             <dt className="text-xs text-muted">{label}</dt>
-            <dd className="mt-0.5 text-xl font-semibold tracking-tight">{value}</dd>
+            <dd className="mt-0.5 text-xl font-semibold tracking-tight">
+              <Odometer value={value} />
+            </dd>
           </div>
         ))}
       </dl>
 
       {lab.providers.length ? (
-        <section aria-labelledby="served-by" className="mt-8">
+        <section aria-labelledby="served-by" className="reveal-3d mt-8">
           <SectionTitle id="served-by" aside="Number of this lab’s models each provider serves">
             Served by
           </SectionTitle>

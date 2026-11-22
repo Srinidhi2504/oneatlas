@@ -28,7 +28,8 @@ export function SelectMenu<T extends string>({
       >
         <span className="text-faint">{label}:</span>
         <span className="truncate font-medium">
-          <Select.Value />
+          {/* render the label ourselves: Radix fills Select.Value only after hydration, which widened the trigger (layout shift) */}
+          <Select.Value>{options.find((o) => o.value === value)?.label}</Select.Value>
         </span>
         <Select.Icon>
           <ChevronDown className="size-3.5 text-faint" aria-hidden />

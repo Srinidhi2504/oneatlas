@@ -3,6 +3,7 @@
 // Only git-visible files (tracked or untracked-but-not-ignored) under the allow-list: never .env, data snapshots, generated code.
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { ANCHOR, KNOWLEDGE } from "../src/components/ask/knowledge";
 
 const INCLUDE = /^(src|scripts|e2e|prisma|docs)\/|^(README\.md|CLAUDE\.md|package\.json|next\.config\.ts|prisma7\.config\.ts|playwright\.config\.ts|vitest\.config\.mts|tsconfig\.json|\.env\.example)$/;
 const EXCLUDE = /^src\/generated\/|\.(ico|svg|png|jpg)$|^docs\/CLAUDE-CODE-PROMPT\.md$|(^|\/)\.env(?!\.example)/;
@@ -45,6 +46,26 @@ function main() {
   writeFileSync("src/generated/code-index.json", JSON.stringify({ files }));
   const bytes = files.reduce((n, f) => n + f.content.length, 0);
   console.log(`code index: ${files.length} files, ${Math.round(bytes / 1024)} KB -> src/generated/code-index.json`);
+
+  // Resolve the prepared answers' {{path|text}} anchors to line numbers. A missing file or text fails the build:
+  // the prepared answers must never cite code that has moved or disappeared.
+  const anchors: Record<string, number> = {};
+  const missing: string[] = [];
+  for (const entry of KNOWLEDGE) {
+    for (const m of entry.answer.matchAll(ANCHOR)) {
+      const [, path, needle] = m;
+      const file = files.find((f) => f.path === path);
+      const line = file ? file.content.split("\n").findIndex((l) => l.includes(needle)) + 1 : 0;
+      if (line > 0) anchors[`${path}|${needle}`] = line;
+      else missing.push(`[${entry.id}] ${path} | ${needle}`);
+    }
+  }
+  writeFileSync("src/generated/ask-anchors.json", JSON.stringify(anchors));
+  if (missing.length) {
+    console.error(`Prepared answers cite code that no longer exists:\n  ${missing.join("\n  ")}`);
+    process.exit(1);
+  }
+  console.log(`ask anchors: ${Object.keys(anchors).length} citations resolved -> src/generated/ask-anchors.json`);
 }
 
 if (process.argv[1]?.replace(/\\/g, "/").endsWith("scripts/build-code-index.ts")) main();

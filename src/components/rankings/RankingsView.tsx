@@ -11,6 +11,7 @@ import { SelectMenu } from "@/components/ui/SelectMenu";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/cn";
 import { formatInteger, formatTokens } from "@/lib/format";
+import { Podium } from "./Podium";
 import { rankingApiQuery, rankingParsers, serializeRankingFilters } from "./state";
 import { CAPABILITIES, MODEL_TYPES, type Capability, type ListMeta, type Rankings } from "@/lib/types";
 
@@ -156,6 +157,11 @@ export function RankingsView({
             </Panel>
           ) : data ? (
             <>
+              {data.meta.page === 1 ? (
+                <div key={`${board}:${qs}`} className="mb-6 px-2 pt-4">
+                  <Podium rows={data.rows} />
+                </div>
+              ) : null}
               <div className={cn("relative overflow-x-auto rounded-[var(--radius-panel)] border border-border transition-opacity", query.isFetching && "opacity-60")} role="region" aria-label="Leaderboard, scrolls horizontally" tabIndex={0}>
                 <table className="w-full min-w-[640px] border-collapse text-13">
                   <caption className="sr-only">{data.board.label} leaderboard</caption>
@@ -206,7 +212,7 @@ export function RankingsView({
           ) : null}
         </div>
 
-        <aside aria-labelledby="labtop">
+        <aside aria-labelledby="labtop" className="reveal-3d">
           <Panel className="p-4">
             <h2 id="labtop" className="text-sm">
               Labs in the top 100

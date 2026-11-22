@@ -41,7 +41,7 @@ async function Catalogue() {
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       {groups.map((g) => (
-        <section key={g} aria-labelledby={`g-${g}`} className="overflow-hidden rounded-[var(--radius-panel)] border border-border">
+        <section key={g} aria-labelledby={`g-${g}`} className="reveal-3d overflow-hidden rounded-[var(--radius-panel)] border border-border">
           <h2 id={`g-${g}`} className="border-b border-border bg-surface px-4 py-2.5 text-sm">
             {g}
             <span className="ml-2 text-xs font-normal text-muted">{all.filter((b) => b.group === g).length} benchmarks</span>

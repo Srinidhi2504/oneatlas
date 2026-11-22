@@ -16,7 +16,8 @@ type Block =
   | { kind: "heading"; level: number; text: string }
   | { kind: "para"; text: string }
   | { kind: "list"; ordered: boolean; items: string[] }
-  | { kind: "code"; lang: string; text: string };
+  | { kind: "code"; lang: string; text: string }
+  | { kind: "table"; header: string[]; rows: string[][] };
 
 /** Line-based block parser; tolerant of a half-streamed answer (an unclosed fence renders as code so far). */
 export function parseBlocks(src: string): Block[] {
@@ -38,6 +39,17 @@ export function parseBlocks(src: string): Block[] {
       const body: string[] = [];
       while (++i < lines.length && !/^\s*```/.test(lines[i])) body.push(lines[i]);
       blocks.push({ kind: "code", lang: fence[1], text: body.join("\n") });
+      continue;
+    }
+    if (/^\s*\|/.test(line)) {
+      flush();
+      const rows: string[][] = [];
+      for (; i < lines.length && /^\s*\|/.test(lines[i]); i++) {
+        if (/^\s*\|?\s*:?-{2,}/.test(lines[i])) continue; // |---|---| separator row
+        rows.push(lines[i].trim().replace(/^\||\|$/g, "").split("|").map((c) => c.trim()));
+      }
+      i--;
+      if (rows.length) blocks.push({ kind: "table", header: rows[0], rows: rows.slice(1) });
       continue;
     }
     const heading = line.match(/^(#{1,4})\s+(.*)$/);
@@ -122,6 +134,33 @@ export function Markdown({ text, onCite }: { text: string; onCite: (c: Citation)
             <pre key={i} className="overflow-x-auto rounded-[var(--radius-control)] border border-border bg-surface p-3 font-mono text-[12px] leading-5">
               <code>{b.text}</code>
             </pre>
+          );
+        if (b.kind === "table")
+          return (
+            <div key={i} className="relative overflow-x-auto rounded-[var(--radius-control)] border border-border">
+              <table className="w-full text-[13px]">
+                <thead className="bg-surface">
+                  <tr>
+                    {b.header.map((h, j) => (
+                      <th key={j} scope="col" className="px-2.5 py-1.5 text-left text-xs font-medium text-muted">
+                        {inline(h, onCite)}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {b.rows.map((r, j) => (
+                    <tr key={j} className="border-t border-border align-top">
+                      {r.map((c, k) => (
+                        <td key={k} className="px-2.5 py-1.5">
+                          {inline(c, onCite)}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           );
         if (b.kind === "list") {
           const List = b.ordered ? "ol" : "ul";

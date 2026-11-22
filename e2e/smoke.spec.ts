@@ -6,7 +6,7 @@ test("explorer filter, detail, compare and rankings", async ({ page }) => {
   page.on("console", (m) => m.type() === "error" && consoleErrors.push(m.text()));
 
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1, name: "Models" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Every AI model, mapped." })).toBeVisible();
 
   // "/" focuses search (retried until React has hydrated); typing filters through the API and lands in the URL
   const search = page.getByRole("searchbox", { name: "Search models" });

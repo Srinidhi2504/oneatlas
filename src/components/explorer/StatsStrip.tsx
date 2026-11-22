@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Odometer } from "@/components/ui/Odometer";
 import { formatInteger } from "@/lib/format";
 import { getStats } from "@/server/services/catalog";
 
@@ -18,14 +19,14 @@ export async function StatsStrip() {
     { label: "Open weights", share: s.coverage.openWeights },
   ];
   return (
-    <section aria-label="Catalog overview" className="grid overflow-hidden rounded-[var(--radius-panel)] border border-border lg:grid-cols-[auto_1fr]">
+    <section aria-label="Catalog overview" className="enter grid overflow-hidden rounded-[var(--radius-panel)] border border-border lg:grid-cols-[auto_1fr]">
       <dl className="grid grid-cols-2 sm:grid-cols-4">
         {counts.map((c, i) => (
           <div key={c.label} className={`border-border px-4 py-3 ${i % 2 ? "border-l" : ""} ${i > 1 ? "border-t sm:border-t-0" : ""} sm:border-l sm:first:border-l-0`}>
             <dt className="text-xs text-muted">{c.label}</dt>
             <dd className="text-xl font-semibold tracking-tight">
               <Link href={c.href} className="hover:text-accent">
-                {formatInteger(c.value)}
+                <Odometer value={formatInteger(c.value)} />
               </Link>
             </dd>
           </div>
@@ -40,7 +41,7 @@ export async function StatsStrip() {
             </dt>
             <dd className="mt-1.5">
               <span role="meter" aria-label={`${c.label} coverage`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(c.share * 100)} className="relative block h-1.5 overflow-hidden rounded-[2px] bg-bar-track">
-                <span className="absolute inset-y-0 left-0 bg-bar" style={{ width: `${c.share * 100}%` }} />
+                <span className="bar-fill absolute inset-y-0 left-0 bg-bar" style={{ width: `${c.share * 100}%` }} />
               </span>
             </dd>
           </div>

@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { Explorer, type ExplorerInitial } from "@/components/explorer/Explorer";
 import { loadExplorerState, toApiQuery, toFilterQuery } from "@/components/explorer/state";
 import { StatsStrip } from "@/components/explorer/StatsStrip";
+import { Hero } from "@/components/hero/Hero";
 import { ModelTable } from "@/components/models/ModelTable";
 import { Skeleton } from "@/components/ui/primitives";
 import { modelFiltersSchema, modelListQuerySchema, paramsToObject } from "@/lib/schemas";
@@ -12,18 +13,19 @@ import { listModels } from "@/server/services/models";
 export default function ExplorerPage({ searchParams }: PageProps<"/">) {
   return (
     <>
-      <div className="pt-8 pb-5">
-        <h1 className="text-[28px] leading-9">Models</h1>
-        <p className="mt-1.5 max-w-[68ch] text-muted">
-          Search and filter every model across labs and API providers. Prices are per 1M tokens; open any model for its providers and benchmarks.
-        </p>
-      </div>
+      <Hero />
       <StatsStrip />
-      <div className="mt-6">
+      <section id="explore" aria-labelledby="explore-title" className="mt-10 scroll-mt-20">
+        <div className="mb-4 flex items-baseline justify-between gap-4">
+          <h2 id="explore-title" className="text-xl">
+            Browse models
+          </h2>
+          <p className="hidden text-13 text-muted sm:block">Prices per 1M tokens. Open any model for its providers and benchmarks.</p>
+        </div>
         <Suspense fallback={<ExplorerSkeleton />}>
           <ExplorerData searchParams={searchParams} />
         </Suspense>
-      </div>
+      </section>
     </>
   );
 }

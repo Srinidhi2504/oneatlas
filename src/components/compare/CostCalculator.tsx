@@ -51,7 +51,7 @@ export function CostCalculator({ models }: { models: ModelDetail[] }) {
   );
 
   return (
-    <Panel aria-labelledby="calc-title" className="p-4">
+    <Panel aria-labelledby="calc-title" className="reveal-3d p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 id="calc-title" className="flex items-center gap-2 text-base">
           <Calculator className="size-4 text-accent" aria-hidden />

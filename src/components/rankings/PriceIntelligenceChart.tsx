@@ -2,6 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { Button, Panel, Skeleton, StateMessage } from "@/components/ui/primitives";
 import { api } from "@/lib/api";
 import { formatPrice, formatScore } from "@/lib/format";
@@ -21,7 +22,26 @@ const ScatterPlot = dynamic(() => import("./ScatterPlot").then((m) => m.ScatterP
   loading: () => <Skeleton className="h-[420px] w-full rounded-[var(--radius-panel)]" />,
 });
 
+/** Mounts the chart only when it comes within 300px of the viewport: Recharts and its data stay off the critical path. */
 export function PriceIntelligenceChart() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        setNear(true);
+        io.disconnect();
+      }
+    }, { rootMargin: "300px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return <div ref={ref}>{near ? <ChartBody /> : <Skeleton className="h-[420px] w-full rounded-[var(--radius-panel)]" />}</div>;
+}
+
+function ChartBody() {
   const query = useQuery({
     queryKey: ["rankings", "value", "chart"],
     // the "value" board is exactly the set of models with both an intelligence score and a positive price

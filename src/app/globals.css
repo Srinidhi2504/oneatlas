@@ -112,6 +112,90 @@
   50% { opacity: 0.55; }
 }
 
+/* ---------- motion system: CSS only, every effect has a reduced-motion fallback ---------- */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes pop {
+  0% { opacity: 0; transform: scale(0.3); }
+  70% { transform: scale(1.18); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes odo { from { transform: translateY(0); } }
+@keyframes reveal-3d {
+  /* transform only: content keeps full contrast while it moves into place */
+  from { transform: perspective(1400px) rotateX(16deg) translateY(36px) scale(0.97); }
+  to { transform: none; }
+}
+@keyframes bar-grow { from { transform: scaleX(0); } }
+@keyframes header-elevate { to { box-shadow: 0 10px 30px -18px rgb(0 0 0 / 0.35); } }
+@keyframes podium-rise {
+  from { transform: rotateX(-90deg); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+/* page and panel entrances */
+.enter { animation: rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(var(--stagger, 0) * 70ms); }
+.pop-in { animation: pop 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
+/* scroll-driven: sections tilt up from the floor as they enter the viewport (progressive enhancement) */
+@supports (animation-timeline: view()) {
+  .reveal-3d {
+    transform-origin: 50% 100%;
+    animation: reveal-3d linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 85%;
+  }
+  .bar-fill {
+    transform-origin: 0 50%;
+    animation: bar-grow linear both;
+    animation-timeline: view();
+    animation-range: entry 20% cover 35%;
+  }
+  .header-elevate {
+    animation: header-elevate linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 96px;
+  }
+}
+
+/* odometer numbers: each digit is a strip of 0-9 that rolls to its value on first paint (SSR-safe, no JS) */
+.odo { display: inline-flex; align-items: flex-end; line-height: 1; height: 1em; overflow: hidden; }
+.odo-digit { display: inline-block; height: 1em; overflow: hidden; }
+.odo-strip {
+  display: flex;
+  flex-direction: column;
+  transform: translateY(calc(var(--d) * -1em));
+  animation: odo 1.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--i) * 55ms + 120ms);
+}
+.odo-strip > span, .odo-char { display: block; height: 1em; line-height: 1em; }
+
+/* pointer tilt with a soft glare (set by components/ui/Tilt.tsx) */
+.tilt {
+  position: relative;
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1), border-color 0.15s, background-color 0.15s;
+  transform-style: preserve-3d;
+}
+.tilt[data-tilting] { transition-duration: 0.08s, 0.15s, 0.15s; }
+.tilt::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(420px circle at var(--gx, 50%) var(--gy, 50%), color-mix(in srgb, var(--accent) 14%, transparent), transparent 45%);
+  opacity: var(--go, 0);
+  transition: opacity 0.3s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-3d, .bar-fill, .odo-strip, .enter, .pop-in { animation: none !important; }
+  .tilt { transform: none !important; }
+}
+
 @layer base {
   html {
     background: var(--bg);
@@ -171,4 +255,12 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+@keyframes ask-slide {
+  from { transform: translateX(32px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [style*="ask-slide"] { animation: none !important; }
 }

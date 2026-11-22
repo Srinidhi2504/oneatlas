@@ -130,17 +130,17 @@ export function ModelTable({
                   ))}
                 </tr>
               ))
-            : items.map((m) => <Row key={m.id} m={m} />)}
+            : items.map((m, i) => <Row key={m.id} m={m} index={i} />)}
         </tbody>
       </table>
     </div>
   );
 }
 
-function Row({ m }: { m: ModelListItem }) {
+function Row({ m, index }: { m: ModelListItem; index: number }) {
   const isNew = daysSince(m.releasedAt) <= 30;
   return (
-    <tr className={cn(ROW_HEIGHT, "group border-b border-border last:border-b-0 hover:bg-surface")}>
+    <tr className={cn(ROW_HEIGHT, "enter group border-b border-border last:border-b-0 hover:bg-surface")} style={{ ["--stagger" as string]: Math.min(index, 14) * 0.45 }}>
       <td className="sticky left-0 z-[1] bg-bg px-1 text-center group-hover:bg-surface">
         <CompareCheckbox entry={{ id: m.id, name: m.name, labName: m.lab.name }} />
       </td>

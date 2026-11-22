@@ -9,6 +9,7 @@ import { CompareButton } from "@/components/models/compare";
 import { ModelCard } from "@/components/models/ModelCard";
 import { ProviderTable } from "@/components/models/ProviderTable";
 import { CopyLinkButton } from "@/components/ui/CopyLinkButton";
+import { Odometer } from "@/components/ui/Odometer";
 import { Badge, cardGrid, LabAvatar, Panel, SectionTitle, Skeleton, Spec, StateMessage } from "@/components/ui/primitives";
 import { formatDate, formatInteger, formatMonth, formatPrice, formatScore, formatTokens } from "@/lib/format";
 import { CORE_BOARDS, type BenchmarkResult, type ModelDetail } from "@/lib/types";
@@ -84,7 +85,7 @@ async function ModelView({ params }: Pick<PageProps<"/models/[lab]/[slug]">, "pa
         <div className="flex min-w-0 items-start gap-3.5">
           <LabAvatar slug={m.lab.slug} name={m.lab.name} size={44} className="mt-0.5" />
           <div className="min-w-0">
-            <h1 className="text-[28px] leading-9 break-words">{m.name}</h1>
+            <h1 className="enter text-[28px] leading-9 break-words">{m.name}</h1>
             <div className="mt-1 flex flex-wrap items-center gap-2 text-13 text-muted">
               <span>
                 by{" "}
@@ -106,7 +107,7 @@ async function ModelView({ params }: Pick<PageProps<"/models/[lab]/[slug]">, "pa
       </header>
 
       {/* stat tiles */}
-      <dl className="grid grid-cols-2 overflow-hidden rounded-[var(--radius-panel)] border border-border sm:grid-cols-3 lg:grid-cols-6">
+      <dl className="enter grid grid-cols-2 overflow-hidden rounded-[var(--radius-panel)] border border-border sm:grid-cols-3 lg:grid-cols-6" style={{ ["--stagger" as string]: 1 }}>
         {[
           ["Context", formatTokens(m.contextWindow), "tokens"],
           ["Max output", formatTokens(m.maxOutputTokens), "tokens"],
@@ -117,7 +118,9 @@ async function ModelView({ params }: Pick<PageProps<"/models/[lab]/[slug]">, "pa
         ].map(([label, value, hint]) => (
           <div key={label} className="-mt-px -ml-px border-t border-l border-border px-4 py-3">
             <dt className="text-xs text-muted">{label}</dt>
-            <dd className="mt-0.5 text-xl font-semibold tracking-tight">{value}</dd>
+            <dd className="mt-0.5 text-xl font-semibold tracking-tight">
+              <Odometer value={value} />
+            </dd>
             <dd className="text-xs text-faint">{hint}</dd>
           </div>
         ))}
@@ -132,7 +135,7 @@ async function ModelView({ params }: Pick<PageProps<"/models/[lab]/[slug]">, "pa
             </section>
           ) : null}
 
-          <section aria-labelledby="benchmarks">
+          <section aria-labelledby="benchmarks" className="reveal-3d">
             <SectionTitle id="benchmarks" aside={m.benchmarks.length ? "Bar length is relative to the best score on each benchmark" : undefined}>
               Benchmarks
             </SectionTitle>
@@ -152,7 +155,7 @@ async function ModelView({ params }: Pick<PageProps<"/models/[lab]/[slug]">, "pa
 
           {m.pricing.input != null || m.listings.length ? <CostCalculator models={[m]} /> : null}
 
-          <section aria-labelledby="providers">
+          <section aria-labelledby="providers" className="reveal-3d">
             <SectionTitle
               id="providers"
               aside={
@@ -195,7 +198,7 @@ async function ModelView({ params }: Pick<PageProps<"/models/[lab]/[slug]">, "pa
             </p>
           </section>
 
-          <section aria-labelledby="specs">
+          <section aria-labelledby="specs" className="reveal-3d">
             <SectionTitle id="specs">Specs and capabilities</SectionTitle>
             <Panel className="px-4">
               <dl>
@@ -217,7 +220,7 @@ async function ModelView({ params }: Pick<PageProps<"/models/[lab]/[slug]">, "pa
             </Panel>
           </section>
 
-          <section aria-labelledby="ranks">
+          <section aria-labelledby="ranks" className="reveal-3d">
             <SectionTitle id="ranks">Rankings</SectionTitle>
             <ul className="grid grid-cols-2 gap-2">
               {CORE_BOARDS.map((b) => {
@@ -245,7 +248,7 @@ async function ModelView({ params }: Pick<PageProps<"/models/[lab]/[slug]">, "pa
       </div>
 
       {more.length ? (
-        <section aria-labelledby="more" className="mt-12">
+        <section aria-labelledby="more" className="reveal-3d mt-12">
           <SectionTitle id="more" aside={<Link href={`/labs/${m.lab.slug}`} className="font-medium text-accent hover:underline">All {m.lab.name} models</Link>}>
             More from {m.lab.name}
           </SectionTitle>

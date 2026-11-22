@@ -8,7 +8,7 @@ Find, compare and rank AI models across labs and API providers. OneAtlas covers 
 |---|---|
 | Catalog | 724 models Â· 91 labs Â· 307 providers Â· 8,618 provider listings Â· 30 benchmarks (1,964 scores) |
 | Stack | Next.js 16 (App Router, Cache Components) Â· React 19 Â· TypeScript Â· Tailwind 4 Â· Node route handlers Â· PostgreSQL on Neon Â· Prisma 7 Â· Zod 4 Â· TanStack Query 5 Â· nuqs 2 |
-| Quality | 58 unit tests (Vitest) Â· Playwright smoke spec Â· Lighthouse mobile 87 to 90 performance and 100 accessibility / best practices on the main pages |
+| Quality | 63 unit tests (Vitest) Â· Playwright smoke spec Â· Lighthouse mobile 87 to 90 performance and 100 accessibility / best practices on the main pages |
 
 ## What you can do
 
@@ -18,7 +18,8 @@ Find, compare and rank AI models across labs and API providers. OneAtlas covers 
 - **Rankings** (`/rankings/{board}`): reach, intelligence, value, cheapest, context, newest and all 30 benchmarks. Filter by lab, type and capability (ranks are recomputed for the filtered set). Includes a "labs in the top 100" panel and a price vs intelligence scatter that traces the value frontier.
 - **Benchmarks** (`/benchmarks`): a catalogue with each benchmark's leader, plus a score matrix with selectable columns where the best score in each column is highlighted.
 - **Labs and providers**: directories, lab pages (models, served-by providers), provider pages (models with that provider's prices).
-- **Ask the code**: a chat panel (header button or `Ctrl/Cmd+K` â†’ "Ask the code") where Claude explains how this app works by reading its own source. It searches and reads files through three read-only tools, shows the route it took ("Searched for â€¦", "Read src/â€¦"), and answers with `path:line` citations that open the exact lines in a source viewer.
+- **Ask the code**: a chat panel (header button, hero button or `Ctrl/Cmd+K` → "Ask the code") that explains how this app is built. By default it serves **21 prepared answers**, ordered by importance, written against the real code and free to run. Each plays back like a live answer: a reading trail ("Read src/…"), streamed text, `path:line` citations that open the exact lines, and follow-up questions. Unmatched questions get the closest suggestions. A **Live** mode (Claude reading the code through tools) is fully built and switches on when `ANTHROPIC_API_KEY` is set.
+- **Look and feel**: a canvas-drawn 3D globe in the hero (drag to spin), scroll-driven 3D section reveals, rolling odometer numbers, pointer-tilt cards, a 3D podium on leaderboards and growing score bars. All CSS or canvas with no animation library, and all switched off under `prefers-reduced-motion`.
 - **Everywhere**: `Ctrl/Cmd+K` command palette, `/` to focus search, light and dark themes (system default, no flash), a compare tray, and loading, empty and error states.
 
 ## Architecture
@@ -108,11 +109,14 @@ curl "localhost:3000/api/v1/models/nope/nothing"     # 404 NOT_FOUND
 
 ## Ask the code (how the assistant works)
 
-1. `npm run codeindex` (also on install, dev and build) snapshots the source and docs into `src/generated/code-index.json`: allow-listed folders only, never `.env` or `data/`.
-2. `POST /api/v1/explain` validates the chat with Zod, rate-limits per client, and runs a bounded loop on Claude Opus 5.5 (`src/server/explain/assistant.ts`). A cached system prompt holds the project map, README and architecture doc; the model calls `search_code`, `read_file` and `list_files` (`src/server/explain/code-tools.ts`, pure and unit-tested) and streams its answer.
-3. The panel (`src/components/ask/AskPanel.tsx`) reads the NDJSON stream, draws the tool steps as a trail, renders the answer with a small safe Markdown renderer, and opens citations in a source viewer. Stop, retry, clear and copy are built in; the conversation persists for the tab.
+**Prepared mode (default, free).** `src/components/ask/knowledge.ts` holds 21 question-and-answer pairs ordered by importance, with keywords for matching typed questions and follow-up links. Answers cite code with anchors such as `{{src/server/http.ts|export function handler}}`. `npm run codeindex` resolves every anchor to its current line number and **fails the build if the cited text has moved**, so citations cannot drift. The panel plays an answer back with a reading trail and streamed text; an unmatched question gets the three closest prepared questions.
 
-Set `ANTHROPIC_API_KEY` to enable it. Without a key the panel explains that it isn't configured. Cost control: at most 6 tool rounds per question, prompt caching, 12 questions per 10 minutes per client.
+**Live mode (kept, off without a key).**
+1. The same script snapshots allow-listed source and docs into `src/generated/code-index.json` (never `.env` or `data/`).
+2. `POST /api/v1/explain` validates the chat, rate-limits per client and runs a bounded loop on Claude Opus 5.5 (`src/server/explain/assistant.ts`) with three read-only tools (`src/server/explain/code-tools.ts`), streaming NDJSON to the panel.
+3. `GET /api/v1/explain` tells the panel whether Live is available.
+
+Set `ANTHROPIC_API_KEY` to show the Live toggle. Cost control: at most 6 tool rounds, prompt caching, 12 questions per 10 minutes per client.
 
 ## Key decisions
 

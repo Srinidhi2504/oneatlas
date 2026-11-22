@@ -1,10 +1,17 @@
+import { connection } from "next/server";
 import { explainRequestSchema } from "@/lib/schemas";
-import { explain, type ExplainEvent } from "@/server/explain/assistant";
-import { fail, toErrorResponse } from "@/server/http";
+import { explain, isConfigured, type ExplainEvent } from "@/server/explain/assistant";
+import { fail, ok, toErrorResponse } from "@/server/http";
 import { createRateLimiter } from "@/server/rate-limit";
 
 // Each question costs model tokens: 12 per 10 minutes per client address is plenty for a person, not for a script.
 const limit = createRateLimiter(12, 10 * 60_000);
+
+/** GET /api/v1/explain -> { live }: whether Live (Claude) mode is available on this deployment. Never cached. */
+export async function GET() {
+  await connection(); // read the environment at request time, not at build time
+  return ok({ live: isConfigured() }, undefined, { cache: false });
+}
 
 /**
  * POST /api/v1/explain  { messages: [{ role, content }] }

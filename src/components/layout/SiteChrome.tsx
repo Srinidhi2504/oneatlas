@@ -7,7 +7,7 @@ import { NavLinks, NavList } from "./NavLinks";
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-bg">
+    <header className="header-elevate sticky top-0 z-40 border-b border-border bg-bg">
       <div className="mx-auto flex h-14 max-w-[1280px] items-center gap-4 px-4 sm:px-6">
         <Logo />
         <nav aria-label="Main" className="hidden md:block">

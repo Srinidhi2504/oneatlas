@@ -131,7 +131,7 @@ export function ScoreBar({ value, best, className, label }: { value: number; bes
       aria-label={label}
       className={cn("relative block h-2 w-full overflow-hidden rounded-[2px] bg-bar-track", className)}
     >
-      <span className="absolute inset-y-0 left-0 bg-bar transition-[width] duration-500 ease-out" style={{ width: `${pct}%` }} />
+      <span className="bar-fill absolute inset-y-0 left-0 bg-bar transition-[width] duration-500 ease-out" style={{ width: `${pct}%` }} />
       {/* quarter ticks over track and fill */}
       <span className="absolute inset-0 bg-[repeating-linear-gradient(90deg,transparent_0,transparent_calc(25%-1.5px),var(--bg)_calc(25%-1.5px),var(--bg)_25%)]" />
     </span>

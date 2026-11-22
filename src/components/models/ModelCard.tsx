@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { Badge, LabAvatar, Skeleton } from "@/components/ui/primitives";
+import { Tilt } from "@/components/ui/Tilt";
 import { daysSince, formatScore, formatTokens } from "@/lib/format";
 import type { ModelListItem } from "@/lib/types";
 import { CapabilityBadges, PriceCell } from "./bits";
@@ -8,7 +9,7 @@ import { CompareButton } from "./compare";
 
 export function ModelCard({ m }: { m: ModelListItem }) {
   return (
-    <article className="group relative flex min-h-[188px] flex-col rounded-[var(--radius-panel)] border border-border bg-bg p-4 transition-colors hover:border-border-strong">
+    <Tilt as="article" className="group flex min-h-[188px] flex-col rounded-[var(--radius-panel)] border border-border bg-bg p-4 hover:border-border-strong">
       <div className="flex items-start gap-3">
         <LabAvatar slug={m.lab.slug} name={m.lab.name} size={32} />
         <div className="min-w-0 flex-1">
@@ -44,7 +45,7 @@ export function ModelCard({ m }: { m: ModelListItem }) {
           <CompareButton entry={{ id: m.id, name: m.name, labName: m.lab.name }} />
         </div>
       </div>
-    </article>
+    </Tilt>
   );
 }
 

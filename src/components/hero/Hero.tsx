@@ -1,0 +1,39 @@
+import { formatInteger } from "@/lib/format";
+import { getStats } from "@/server/services/catalog";
+import { ButtonLink } from "@/components/ui/primitives";
+import { AtlasGlobe } from "./AtlasGlobe";
+import { AskCta } from "./AskCta";
+
+/** Home hero: what this is, in one sentence with live catalog numbers, and the globe. Cached read: static shell. */
+export async function Hero() {
+  const s = await getStats();
+  return (
+    <section aria-labelledby="hero-title" className="relative grid items-center gap-2 pt-6 pb-4 sm:pt-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,460px)] lg:gap-8">
+      <div className="relative z-[1]">
+        <h1 id="hero-title" className="enter max-w-[14ch] text-[40px] leading-[1.02] font-semibold tracking-[-0.03em] sm:text-[56px]">
+          Every AI model, mapped.
+        </h1>
+        <p className="enter mt-4 max-w-[54ch] text-[15px] leading-relaxed text-muted" style={{ ["--stagger" as string]: 1 }}>
+          {formatInteger(s.models)} models from {formatInteger(s.labs)} labs, served by {formatInteger(s.providers)} API providers. Compare prices, context windows,
+          capabilities and benchmarks side by side, then open any model to see who serves it and for how much.
+        </p>
+        <div className="enter mt-6 flex flex-wrap gap-2" style={{ ["--stagger" as string]: 2 }}>
+          <ButtonLink href="#explore" variant="primary" className="h-10 px-4">
+            Explore models
+          </ButtonLink>
+          <ButtonLink href="/rankings/value" className="h-10 px-4">
+            Best value right now
+          </ButtonLink>
+          <AskCta />
+        </div>
+        <p className="enter mt-5 hidden text-xs text-faint sm:block" style={{ ["--stagger" as string]: 3 }}>
+          Press <kbd className="rounded border border-border px-1 font-sans">/</kbd> to search models,{" "}
+          <kbd className="rounded border border-border px-1 font-sans">Ctrl K</kbd> for everything.
+        </p>
+      </div>
+      <div className="relative -mx-4 h-[260px] sm:mx-0 sm:h-[360px] lg:h-[440px]">
+        <AtlasGlobe className="enter absolute inset-0 h-full w-full" />
+      </div>
+    </section>
+  );
+}

@@ -10,7 +10,7 @@ type Variant = "primary" | "secondary" | "ghost";
 type Size = "sm" | "md";
 
 const buttonBase =
-  "inline-flex select-none items-center justify-center gap-1.5 whitespace-nowrap rounded-[var(--radius-control)] font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0";
+  "inline-flex select-none items-center justify-center gap-1.5 whitespace-nowrap rounded-[var(--radius-control)] font-medium transition-[color,background-color,border-color,transform] duration-150 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0";
 const buttonVariants: Record<Variant, string> = {
   primary: "bg-accent text-accent-fg hover:bg-accent-hover",
   secondary: "border border-border bg-bg text-fg hover:border-border-strong hover:bg-surface",
@@ -72,8 +72,8 @@ export function PageHeader({ title, description, actions, children }: { title: R
   return (
     <div className="flex flex-col gap-3 pt-8 pb-6 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
-        <h1 className="text-[28px] leading-9">{title}</h1>
-        {description ? <p className="mt-1.5 max-w-[68ch] text-muted">{description}</p> : null}
+        <h1 className="enter text-[28px] leading-9">{title}</h1>
+        {description ? <p className="enter mt-1.5 max-w-[68ch] text-muted" style={{ ["--stagger" as string]: 1 }}>{description}</p> : null}
         {children}
       </div>
       {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}

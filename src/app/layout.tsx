@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Footer, Header } from "@/components/layout/SiteChrome";
 import { CompareTray } from "@/components/models/compare";
@@ -41,7 +42,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             {children}
           </main>
           <Footer />
-          <CompareTray />
+          <Suspense fallback={null}>
+            <CompareTray />
+          </Suspense>
         </Providers>
       </body>
     </html>

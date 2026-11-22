@@ -15,7 +15,8 @@ export default function ComparePage({ searchParams }: PageProps<"/compare">) {
   return (
     <>
       <PageHeader title="Compare models" description="Up to four models side by side. The best value in each row is highlighted; the URL is shareable." />
-      <Suspense fallback={<Skeleton className="h-96 w-full rounded-[var(--radius-panel)]" />}>
+      {/* fallback as tall as the viewport: the table streaming in must not push visible content (CLS) */}
+      <Suspense fallback={<Skeleton className="min-h-[100dvh] w-full rounded-[var(--radius-panel)]" />}>
         <CompareData searchParams={searchParams} />
       </Suspense>
     </>

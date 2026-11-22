@@ -256,6 +256,7 @@ export function Explorer({ initial }: { initial: ExplorerInitial }) {
         <ActiveFilters state={state} facets={facets.data} update={update} clearAll={clearAll} />
 
         {/* results */}
+        <h2 className="sr-only">Results</h2>
         <div className="relative mt-3">
           <div className="absolute inset-x-0 -top-2 h-0.5 overflow-hidden" aria-hidden>
             {refreshing ? <div className="h-full w-1/3 animate-progress bg-accent" /> : null}
@@ -298,7 +299,7 @@ export function Explorer({ initial }: { initial: ExplorerInitial }) {
                 <ModelTable items={data?.items ?? []} loading={showSkeleton} dimmed={refreshing} sortState={{ sort, order }} onSort={onSort} />
               </div>
               {!state.view ? (
-                <div className={cn("grid gap-3 sm:hidden", refreshing && "opacity-60")}>
+                <div className={cn("grid grid-cols-1 gap-3 sm:hidden", refreshing && "opacity-60")}>
                   {showSkeleton ? Array.from({ length: 4 }, (_, i) => <ModelCardSkeleton key={i} />) : data!.items.map((m) => <ModelCard key={m.id} m={m} />)}
                 </div>
               ) : null}

@@ -142,4 +142,8 @@ Read-only public API; inputs validated and bounded; no raw SQL string interpolat
 | 2026-11-22 | Labs and providers directories filter in memory on the client (data server-rendered from the cached service) | 91 / 307 rows: instant filtering beats a round trip; the `/labs` and `/providers` APIs still exist for other clients |
 | 2026-11-22 | Cost calculator ignores $0 listings on paid models | They are subscription-bundled (e.g. coding plans), not usable per-token prices |
 | 2026-11-22 | Table min width tuned so the explorer table fits at 1280 px without horizontal scroll (Type shown as a badge for non-text models; max output under context) | Density goal from the brief |
+| 2026-11-22 | Pool capped at 5 connections per process; connection errors retried 3x with backoff (150/500/1500 ms) | `next build` (15 prerender workers) intermittently hit "DatabaseNotReachable" on Neon; bounded pools are also right for serverless |
+| 2026-11-22 | `usePathname()` consumers in the layout (nav active state, compare tray) wrapped in `<Suspense>` with a static fallback | Under Cache Components the pathname is runtime data; outside Suspense it made on-demand/revalidated dynamic routes return 500 (`CLIENT_HOOK_DYNAMIC`) |
+| 2026-11-22 | Revalidate endpoint uses `revalidateTag("catalog", { expire: 0 })` and answers 404 to missing/wrong tokens | Data changed at the source, so the next request must not see the old catalog; 404 avoids advertising the endpoint |
+| 2026-11-22 | Known limitation: an unknown model/lab/provider URL renders the branded 404 page with HTTP 200 | With PPR the static shell is already streamed before `notFound()` runs. The API returns a real 404. Fix later with `generateStaticParams` for all slugs + `dynamicParams`-style gating if needed |
 

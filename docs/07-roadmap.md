@@ -49,7 +49,7 @@ Files: `src/lib/schemas.ts`, `src/server/{http.ts,mappers.ts,services/*}`, `src/
 - [x] `CommandPalette` (native dialog) + `/search`
 - [x] Compare tray + `useCompareList`
 - [x] Model detail page (all sections, `generateStaticParams` top 50, `generateMetadata`, `notFound`)
-- [ ] Checked at 375 / 768 / 1280 px, keyboard-only pass, no console errors
+- [x] Checked at 375 / 768 / 1280 px, keyboard-only pass, no console errors. Done: every page swept at 375/768/1280 in light and dark (no page overflow, no console errors); keyboard path verified (skip link, nav, `/`, Ctrl+K, arrows, compare checkboxes)
 
 ## P4 Compare, rankings, benchmarks, labs, providers
 
@@ -64,9 +64,9 @@ Files: `src/lib/schemas.ts`, `src/server/{http.ts,mappers.ts,services/*}`, `src/
 
 - [x] Cost calculator on detail and compare
 - [x] Price-vs-intelligence scatter on Rankings (lazy-loaded Recharts, table fallback)
-- [ ] Playwright smoke test: explorer filter -> detail -> compare -> rankings (`npx playwright install chromium`; keep to 1 spec)
-- [ ] Lighthouse mobile pass (Performance, A11y >= 90), fix top 3 findings; bundle check
-- [ ] `POST /api/internal/revalidate` (bearer secret) calling `revalidateTag('catalog')`
+- [x] Playwright smoke test: explorer filter -> detail -> compare -> rankings (`npx playwright install chromium`; keep to 1 spec). `e2e/smoke.spec.ts`, `npm run test:e2e` (after `npm run build`)
+- [x] Lighthouse mobile pass (Performance, A11y >= 90), fix top 3 findings; bundle check. Final (local `next start`, mobile): `/` 90/100/100, model page 90/100/100, `/compare` 87/100/100 (Perf/A11y/BP), CLS <= 0.001. Fixed: 500 on on-demand pages (usePathname outside Suspense), CLS 0.217 on /compare, faint-text contrast, heading order
+- [x] `POST /api/internal/revalidate` (bearer secret) calling `revalidateTag('catalog')`
 
 ## P6 Ship
 

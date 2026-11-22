@@ -13,10 +13,15 @@ export const NAV = [
 
 export function NavLinks({ className, onNavigate }: { className?: string; onNavigate?: () => void }) {
   const pathname = usePathname() ?? "/";
+  return <NavList className={className} onNavigate={onNavigate} pathname={pathname} />;
+}
+
+/** Same links without an active item: the static-shell fallback while the pathname (runtime data) streams in. */
+export function NavList({ className, onNavigate, pathname }: { className?: string; onNavigate?: () => void; pathname?: string }) {
   return (
     <ul className={cn("flex items-center gap-0.5", className)}>
       {NAV.map((item) => {
-        const active = item.match(pathname);
+        const active = pathname ? item.match(pathname) : false;
         return (
           <li key={item.href}>
             <Link

@@ -38,7 +38,7 @@ export function ModelCard({ m }: { m: ModelListItem }) {
           <dd className="mt-0.5">{m.intelligenceIndex != null ? formatScore(m.intelligenceIndex) : <span className="text-faint">N/A</span>}</dd>
         </div>
       </dl>
-      <div className="mt-auto flex items-end justify-between gap-2 pt-3">
+      <div className="mt-auto flex flex-wrap items-end justify-between gap-2 pt-3">
         <CapabilityBadges caps={m.capabilities} limit={2} />
         <div className="relative z-[1] shrink-0">
           <CompareButton entry={{ id: m.id, name: m.name, labName: m.lab.name }} />

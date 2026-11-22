@@ -2,7 +2,8 @@ import { formatDate, formatInteger } from "@/lib/format";
 import { getStats } from "@/server/services/catalog";
 import { HeaderActions } from "./HeaderActions";
 import { Logo } from "./Logo";
-import { NavLinks } from "./NavLinks";
+import { Suspense } from "react";
+import { NavLinks, NavList } from "./NavLinks";
 
 export function Header() {
   return (
@@ -10,7 +11,10 @@ export function Header() {
       <div className="mx-auto flex h-14 max-w-[1280px] items-center gap-4 px-4 sm:px-6">
         <Logo />
         <nav aria-label="Main" className="hidden md:block">
-          <NavLinks />
+          {/* usePathname() is runtime data under Cache Components: stream the active state, keep the links static */}
+          <Suspense fallback={<NavList />}>
+            <NavLinks />
+          </Suspense>
         </nav>
         <div className="ml-auto flex items-center gap-1">
           <HeaderActions />

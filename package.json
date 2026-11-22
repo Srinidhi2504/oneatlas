@@ -15,7 +15,8 @@
     "db:studio": "prisma studio",
     "postinstall": "prisma generate",
     "ingest:fetch": "tsx scripts/ingest/fetch.ts",
-    "db:seed": "tsx scripts/ingest/seed.ts"
+    "db:seed": "tsx scripts/ingest/seed.ts",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.1",

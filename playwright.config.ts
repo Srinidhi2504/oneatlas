@@ -6,7 +6,8 @@ const baseURL = process.env.E2E_BASE_URL ?? "http://localhost:3300";
 
 export default defineConfig({
   testDir: "e2e",
-  timeout: 60_000,
+  timeout: 120_000, // first run after a build hits cold caches
+  expect: { timeout: 15_000 }, // cold caches from a laptop far from the DB region can take several seconds per page
   retries: process.env.CI ? 1 : 0,
   use: { baseURL, trace: "retain-on-failure" },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],

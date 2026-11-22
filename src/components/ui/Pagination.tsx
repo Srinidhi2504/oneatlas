@@ -5,7 +5,7 @@ import { formatInteger } from "@/lib/format";
 import type { ListMeta } from "@/lib/types";
 
 /** 1 … 4 5 [6] 7 8 … 31 */
-export function pageWindow(page: number, total: number): (number | "gap")[] {
+function pageWindow(page: number, total: number): (number | "gap")[] {
   const pages = new Set([1, total, page - 1, page, page + 1].filter((p) => p >= 1 && p <= total));
   const sorted = [...pages].sort((a, b) => a - b);
   return sorted.flatMap((p, i) => (i > 0 && p - sorted[i - 1] > 1 ? ["gap" as const, p] : [p]));

@@ -1,6 +1,5 @@
 // Display formatting shared by server (ranking labels) and UI. Pure functions on Intl, no locale surprises: en-US.
 
-const compact = new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 });
 const integer = new Intl.NumberFormat("en-US");
 
 const trim = (x: number, digits: number) => String(Number(x.toFixed(digits)));
@@ -31,7 +30,6 @@ export function formatMoney(n: number | null | undefined): string {
   return `$${n.toFixed(2)}`;
 }
 
-export const formatCompact = (n: number | null | undefined) => (n == null ? "N/A" : compact.format(n));
 export const formatInteger = (n: number | null | undefined) => (n == null ? "N/A" : integer.format(n));
 
 /** Scores: index -> one decimal ("59.1"), elo -> integer ("1,491"). */

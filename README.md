@@ -1,35 +1,134 @@
 # OneAtlas
 
-AI model discovery and intelligence platform: browse, search, filter, compare and rank AI models across labs and providers (specs, pricing, capabilities, benchmarks).
+Find, compare and rank AI models across labs and API providers. OneAtlas covers specs, per-provider pricing, capabilities and benchmarks, all served from Postgres through a typed REST API.
 
-> Work in progress. Status and plan: [`docs/07-roadmap.md`](docs/07-roadmap.md). Live URL: _to be added at deploy_.
+**Live:** _added after the Vercel deploy_ · **API:** `/api/v1` ([contract](docs/05-api-spec.md)) · **Role:** Full Stack Engineer take-home
 
-**Stack:** Next.js 16 (App Router, Cache Components) · React 19 · TypeScript · Tailwind 4 · Node route handlers · PostgreSQL (Neon) · Prisma 7 · Zod · TanStack Query · nuqs.
+| | |
+|---|---|
+| Catalog | 724 models · 91 labs · 307 providers · 8,618 provider listings · 30 benchmarks (1,964 scores) |
+| Stack | Next.js 16 (App Router, Cache Components) · React 19 · TypeScript · Tailwind 4 · Node route handlers · PostgreSQL on Neon · Prisma 7 · Zod 4 · TanStack Query 5 · nuqs 2 |
+| Quality | 48 unit tests (Vitest) · Playwright smoke spec · Lighthouse mobile 87 to 90 performance and 100 accessibility / best practices on the main pages |
 
-## Quick start
+## What you can do
 
-```bash
-npm install                      # also runs prisma generate
-cp .env.example .env             # add your Neon pooled + direct URLs
-npx prisma migrate deploy        # create tables, pg_trgm extension, indexes
-npm run db:seed                  # ingest from data/snapshots (available after roadmap P1)
-npm run dev
+- **Explore** (`/`): search with typo-tolerant matching ("gpt4o" finds GPT-4o), faceted filters with live counts (lab, provider, type), capability chips, sort by price, context, release date, intelligence, value or availability. Switch between table and cards. Every filter lives in the URL, so views are shareable and the back button works.
+- **Model pages** (`/models/{lab}/{slug}`): stat tiles, reference pricing plus a monthly cost calculator, capabilities and modalities, benchmark bars with "#rank of N", Design Arena results, rank chips for every leaderboard, and every provider listing with that provider's own prices.
+- **Compare** (`/compare?ids=…`): 2 to 4 models side by side. The best value in each row is marked with a label as well as colour, there's a "differences only" toggle, a cost calculator at the cheapest provider, and a share link.
+- **Rankings** (`/rankings/{board}`): reach, intelligence, value, cheapest, context, newest and all 30 benchmarks. Filter by lab, type and capability (ranks are recomputed for the filtered set). Includes a "labs in the top 100" panel and a price vs intelligence scatter that traces the value frontier.
+- **Benchmarks** (`/benchmarks`): a catalogue with each benchmark's leader, plus a score matrix with selectable columns where the best score in each column is highlighted.
+- **Labs and providers**: directories, lab pages (models, served-by providers), provider pages (models with that provider's prices).
+- **Everywhere**: `Ctrl/Cmd+K` command palette, `/` to focus search, light and dark themes (system default, no flash), a compare tray, and loading, empty and error states.
+
+## Architecture
+
+```mermaid
+flowchart LR
+  subgraph Sources[Public sources, no key]
+    MD[models.dev api.json]
+    OR[OpenRouter /models]
+  end
+  subgraph Ingest[scripts/ingest]
+    F[fetch -> data/snapshots] --> N[normalise + Zod validate] --> J[join by canonical key] --> U[upsert in transaction] --> R[ranks + denormalised columns]
+  end
+  MD --> F
+  OR --> F
+  R --> DB[(Neon Postgres via Prisma 7)]
+  subgraph App[Next.js 16]
+    SVC[src/server/services: the only code that touches Prisma, 'use cache']
+    API[app/api/v1/**/route.ts: thin handlers]
+    RSC[Server Components: static shell + Suspense]
+    CL[Client islands: TanStack Query + nuqs]
+  end
+  DB --> SVC
+  SVC --> API
+  SVC --> RSC
+  API --> CL
+  RSC -- initial data --> CL
 ```
 
-## Documentation
+- **One request, end to end:** a filter change updates the URL (nuqs), which changes the TanStack Query key. The client calls `GET /api/v1/models?…`, the route handler validates the query with the shared Zod schema, and the service builds one `Prisma.ModelWhereInput` and queries Postgres. The mapper converts `Decimal`/`Date` to plain JSON, and the response comes back in the `{ data, meta }` envelope. The server-rendered first page uses the same service and the same canonical query string, so hydration never refetches.
+- **Layers:** route handlers parse, call a service and shape the response. Services hold the logic and are the only Prisma users. Server Components call the same services. See [`docs/03-architecture.md`](docs/03-architecture.md) for the decision log (every deviation from the plan is recorded there).
+- **Caching:** service reads use `'use cache'` + `cacheLife('hours')` + `cacheTag('catalog')`, and API responses set `s-maxage=300, stale-while-revalidate=3600`. After a re-seed, `POST /api/internal/revalidate` (bearer secret) expires the whole catalog at once.
+- **Errors:** every input goes through Zod and returns `400 INVALID_QUERY` with field details. Unknown entities return `404 NOT_FOUND`. Anything else returns `500 INTERNAL` with a request id, and database messages never reach clients.
 
-| Doc | Topic |
-|-----|-------|
-| [`CLAUDE.md`](CLAUDE.md) | Rules and commands for AI-assisted development |
-| [`docs/01-requirements.md`](docs/01-requirements.md) | Assignment, rubric, acceptance criteria |
-| [`docs/02-research.md`](docs/02-research.md) | Research and measured data-source findings |
-| [`docs/03-architecture.md`](docs/03-architecture.md) | Architecture, decisions, scalability |
-| [`docs/04-data-model-and-ingestion.md`](docs/04-data-model-and-ingestion.md) | Schema semantics and ingestion pipeline |
-| [`docs/05-api-spec.md`](docs/05-api-spec.md) | REST API contract |
-| [`docs/06-frontend-spec.md`](docs/06-frontend-spec.md) | Routes, components, UX |
-| [`docs/07-roadmap.md`](docs/07-roadmap.md) | Phased task list |
-| [`docs/08-deploy-and-submission.md`](docs/08-deploy-and-submission.md) | Deploy, QA, Loom outline |
+## Data pipeline
 
-## Data sources
+The key insight is that models.dev already resolves 8,618 provider listings to **658 canonical models** (`canonical_model_id`). That's the spine. OpenRouter adds descriptions and benchmarks (Artificial Analysis indices, Design Arena Elo).
 
-[models.dev](https://models.dev) (providers, models, pricing, canonical ids) and [OpenRouter](https://openrouter.ai/api/v1/models) (descriptions, Artificial Analysis and Design Arena benchmarks). Snapshots are committed in `data/snapshots/` for reproducible seeding.
+1. `npm run ingest:fetch` downloads both sources to `data/snapshots/` (committed, so seeding is deterministic and offline).
+2. `npm run db:seed` validates every row with Zod (bad rows are logged and skipped, never crash the run). It then groups rows by canonical id and joins OpenRouter with a tested key: a lab alias map (`qwen → alibaba`, `z-ai → zhipuai`, …) plus a slug normaliser that drops `:variant` suffixes, trailing dates and punctuation.
+   - **Join result:** 284 of 350 OpenRouter keys match, 5 are ambiguous and all resolved, and 66 become OpenRouter-only models.
+   - **Derived fields:** reference price (first-party → OpenRouter → median), provider count, search key, competition ranks per benchmark, intelligence and value scores.
+   - **Writes:** labs, providers and models are upserted; listings and scores are replaced in one transaction.
+3. The seed is idempotent (two runs give identical counts) and prints a report checked against sanity bands. A full run takes about 55 s against Neon.
+
+Prices are USD per 1M tokens everywhere. Blended = (3 × input + output) / 4. Value = intelligence / blended price. These formulas were checked against oneatlas.dev for Claude Opus 5.5: $4 / $20 gives a blended $8.00, and value 7.4 at intelligence 59.1.
+
+## Run it locally
+
+Requires Node 22+ and a Postgres database (a free Neon project works).
+
+```bash
+npm install                    # also runs prisma generate
+cp .env.example .env           # DATABASE_URL (pooled) + DIRECT_URL (direct), optional REVALIDATE_SECRET
+npm run db:deploy              # migrations: tables, indexes, pg_trgm + trigram index
+npm run db:seed                # ingest data/snapshots (about 1 min)
+npm run dev                    # http://localhost:3000
+```
+
+Checks: `npm run typecheck && npm run lint && npm test && npm run build`, then `npm run test:e2e` (Playwright, starts `next start` on port 3300). To refresh source data, run `npm run ingest:fetch` and then `npm run db:seed`.
+
+## API summary
+
+All endpoints are `GET` under `/api/v1` unless marked otherwise. The full contract is in [`docs/05-api-spec.md`](docs/05-api-spec.md).
+
+| Endpoint | Purpose |
+|---|---|
+| `/models` | List with `q, lab, provider, type, capability, inputModality, outputModality, minContext, maxPrice, includeDeprecated, sort, order, page, pageSize` (max 100) |
+| `/models/{lab}/{slug}` | Detail: listings, benchmarks with rank, ranks on every board |
+| `/compare?ids=a/b,c/d` | 2 to 4 model details + union of benchmark keys |
+| `/search?q=` | Models, labs and providers for the command palette |
+| `/facets` | Filter counts given the other active filters |
+| `/stats`, `/health` | Catalog totals and capability coverage; DB liveness (never cached) |
+| `/labs`, `/labs/{lab}` | Lab directory and lab page data |
+| `/providers`, `/providers/{provider}` | Provider directory and paginated listings with the provider's prices |
+| `/rankings/{board}` | Core boards or any benchmark key, filtered and ranked |
+| `/benchmarks`, `/benchmarks/matrix` | Catalogue with leaders; score matrix |
+| `POST /api/internal/revalidate` | Bearer-protected cache invalidation after a re-seed |
+
+```bash
+curl "localhost:3000/api/v1/models?q=gpt4o&capability=tools&pageSize=5"
+curl "localhost:3000/api/v1/models?pageSize=1000"   # 400 INVALID_QUERY with field details
+curl "localhost:3000/api/v1/models/nope/nothing"     # 404 NOT_FOUND
+```
+
+## Key decisions
+
+| Decision | Why |
+|---|---|
+| Next.js route handlers, not NestJS | One repo, one deploy, Zod schemas and types shared by API, pages and client |
+| Service layer is the only Prisma user | Logic in one place, reused by API and Server Components, testable pieces split out (`model-where.ts`) |
+| SSR first page + client API calls | Fast first paint and a real, visible API integration; one shared query string means no double fetch |
+| `pg_trgm` on a normalised `searchKey` | "gpt4o", "claude son" and other partial or typo queries work with no search infrastructure |
+| Denormalised hot columns (`providerCount`, `intelligenceIndex`, `valueScore`, `blendedPrice`) and precomputed ranks | Sorts and leaderboards need no joins or aggregation at request time; data only changes at ingest |
+| `Decimal(12,6)` money in the DB, `number` in DTOs | Exact sub-cent prices; conversion happens only in the mapper |
+| URL is the state (nuqs) | Every view is shareable and back-button safe |
+
+## Limitations
+
+- Coverage: models.dev rows without a canonical id (1,405, mostly small gateways) are not ingested, and OpenRouter exposes no coding or agentic index today. So the catalog has 724 models against oneatlas.dev's 1,118.
+- Provider counts are 15 to 30% higher than oneatlas.dev because every models.dev provider id counts separately (plans and regional variants included).
+- Unknown model URLs render the branded 404 page with HTTP 200: the streamed static shell is sent before `notFound()` runs. The API returns a real 404.
+- Filtered ranks, search relevance and the benchmark matrix are computed in memory over at most about 1k light rows. That's fine at this size; the 100x plan is below.
+- No auth, writes, live provider uptime or long-context price tiers (out of scope).
+
+## What I would do next
+
+1. **Scale (100x):** keyset pagination, `RANK() OVER` / materialised views refreshed at ingest, `tsvector` or a search service, read replicas, edge rate limiting.
+2. **Data:** orphan-row ingestion, long-context and batch price tiers, OpenRouter endpoint uptime and latency, the Artificial Analysis API for coding and agentic indices.
+3. **Ops:** scheduled `ingest:fetch` + seed + revalidate in CI, request-id response header, error tracking.
+
+## Data sources and attribution
+
+Model, provider and price data come from [models.dev](https://models.dev). Descriptions and benchmark feeds come from [OpenRouter](https://openrouter.ai/models). Benchmarks are by [Artificial Analysis](https://artificialanalysis.ai) and [Design Arena](https://www.designarena.ai). Lab "logos" are generated initials: no third-party logos or assets are used. All data is public and keyless; snapshots are dated in `data/snapshots/MANIFEST.json`.

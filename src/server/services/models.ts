@@ -68,7 +68,7 @@ async function benchmarkTotals(): Promise<Record<string, { count: number; best: 
 const GROUP_ORDER = ["Artificial Analysis", "Design Arena"];
 const CATEGORY_ORDER = ["general", "domain", "design", "design-agents"];
 /** Intelligence first, then by group, category, the derived arena average, name. */
-export const benchmarkSortKey = (b: { key: string; group: string; category: string; name: string }) =>
+const benchmarkSortKey = (b: { key: string; group: string; category: string; name: string }) =>
   [
     b.key === "intelligence" ? 0 : 1,
     GROUP_ORDER.indexOf(b.group),

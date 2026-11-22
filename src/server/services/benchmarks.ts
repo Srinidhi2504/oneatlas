@@ -45,7 +45,7 @@ export async function listBenchmarks(): Promise<BenchmarkSummary[]> {
 }
 
 /** intelligence + the 4 most-populated Design Arena (models) categories. */
-export async function defaultMatrixKeys(): Promise<string[]> {
+async function defaultMatrixKeys(): Promise<string[]> {
   const all = await listBenchmarks();
   const design = all.filter((b) => b.category === "design" && b.key !== "arena").sort((a, b) => b.scoredCount - a.scoredCount);
   return [...all.filter((b) => b.key === "intelligence"), ...design.slice(0, 4)].map((b) => b.key);

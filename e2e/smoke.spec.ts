@@ -5,12 +5,15 @@ test("explorer filter, detail, compare and rankings", async ({ page }) => {
   const consoleErrors: string[] = [];
   page.on("console", (m) => m.type() === "error" && consoleErrors.push(m.text()));
 
-  await page.goto("/", { waitUntil: "networkidle" }); // let React hydrate before using keyboard shortcuts
+  await page.goto("/");
   await expect(page.getByRole("heading", { level: 1, name: "Models" })).toBeVisible();
 
-  // "/" focuses search; typing filters through the API and lands in the URL (shareable state)
-  await page.keyboard.press("/");
-  await expect(page.getByRole("searchbox", { name: "Search models" })).toBeFocused();
+  // "/" focuses search (retried until React has hydrated); typing filters through the API and lands in the URL
+  const search = page.getByRole("searchbox", { name: "Search models" });
+  await expect(async () => {
+    await page.keyboard.press("/");
+    await expect(search).toBeFocused({ timeout: 500 });
+  }).toPass({ timeout: 30_000 });
   await page.keyboard.type("gpt4o");
   await expect(page).toHaveURL(/q=gpt4o/);
   const table = page.getByRole("table", { name: "AI models" });

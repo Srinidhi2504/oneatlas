@@ -70,7 +70,7 @@ Files: `src/lib/schemas.ts`, `src/server/{http.ts,mappers.ts,services/*}`, `src/
 
 ## P6 Ship
 
-- [ ] Real `README.md`: what/why, live URL, stack, architecture diagram (from `03`), data sources + attribution, setup (`npm i`, `.env`, `db:migrate`, `db:seed`, `dev`), API summary, decisions, limitations, what I'd do next
+- [x] Real `README.md`: what/why, live URL, stack, architecture diagram (from `03`), data sources + attribution, setup (`npm i`, `.env`, `db:migrate`, `db:seed`, `dev`), API summary, decisions, limitations, what I'd do next
 - [ ] Final QA on the live URL (mobile too); `npm run typecheck && npm run lint && npm test && npm run build` clean; remove dead code; `.env` not committed
 - [ ] Record the Loom using the outline in `08` (5 to 10 min)
 - [ ] Submit the Google Form (live URL, repo URL, Loom URL)

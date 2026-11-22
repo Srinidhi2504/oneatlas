@@ -9,7 +9,7 @@ import type { ModelListItem } from "@/lib/types";
 import { CapabilityIcons, ModalityIcons, PriceCell } from "./bits";
 import { CompareCheckbox } from "./compare";
 
-export const ROW_HEIGHT = "h-14"; // 56px: skeleton rows use the same height, so loading never shifts layout
+const ROW_HEIGHT = "h-14"; // 56px: skeleton rows use the same height, so loading never shifts layout
 
 export interface SortState {
   sort: ModelSort;

@@ -70,6 +70,7 @@ model Model {
   // denormalised at ingest so list sorts/filters need no join (source of truth = BenchmarkScore / ProviderModel)
   providerCount     Int    @default(0)
   intelligenceIndex Float?
+  valueScore        Float? // intelligenceIndex / blendedPrice (src/lib/pricing.ts); powers the "value" sort and board
 
   openrouterId String? @unique // set when OpenRouter data was joined (or the model exists only there)
   searchKey    String // normalised lab+name+slug, lowercase a-z0-9 only: "gpt4o" matches "GPT-4o"
@@ -87,6 +88,7 @@ model Model {
   @@index([contextWindow])
   @@index([providerCount(sort: Desc)])
   @@index([intelligenceIndex(sort: Desc)])
+  @@index([valueScore(sort: Desc)])
   // plus GIN trigram index on searchKey: created in migration SQL (Prisma cannot express gin_trgm_ops here)
 }
 

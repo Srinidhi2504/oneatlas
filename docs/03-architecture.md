@@ -120,3 +120,10 @@ Read-only public API; inputs validated and bounded; no raw SQL string interpolat
 |------|--------|--------|
 | 2026-11-22 | `deprecated Boolean` instead of `deprecatedAt`; `ProviderModel.status` added | models.dev exposes status, not a date |
 | 2026-11-22 | models.dev made the spine, OpenRouter enrichment (reversed the initial plan) | Discovered `canonical_model_id`; see `02` |
+| 2026-11-22 | Join baseline corrected to 350 keys / 284 matched / 5 ambiguous / 66 unmatched (was 357 / 283 / 74) | The original count included the 7 `openrouter/*` routers that `04` says to skip; +1 match from the `ibm-granite` alias |
+| 2026-11-22 | Sanity bands: Lab 40..100 (was ..90), models with intelligence >= 60 (was >= 150) | Measured maxima of the snapshot: 8 labs exist only on OpenRouter; only 65 distinct models carry `intelligence_index`. The old band counted any AA value incl. variants |
+| 2026-11-22 | Added `ibm-granite -> ibm` to `LAB_ALIAS` | Found by the seed's unmatched-lab report |
+| 2026-11-22 | Added `Model.valueScore` (denormalised, indexed) + migration `20261122120000_value_score` | `05` allowed it: makes the `value` sort and board a plain `ORDER BY` instead of raw SQL. The generated migration tried to drop the hand-written trigram index; that line was removed by hand |
+| 2026-11-22 | OpenRouter-only models: `openWeights = !!hugging_face_id` | OpenRouter has no open-weights flag, but links a Hugging Face repo exactly for open-weights models |
+| 2026-11-22 | Seed clears `openrouterId` before upserting models | The id is unique and can move between models when aliases or snapshots change |
+| 2026-11-22 | Spot-check vs oneatlas.dev: price, context and intelligence match for Claude Opus 5.5, GLM-5.3, Kimi K3. Provider counts are 15 to 30% higher (e.g. GLM-5.3 133 vs 93) | We count every distinct models.dev provider (incl. plan/regional variants); oneatlas curates providers (223 vs our 307 overall, same ratio). GPT OSS 120B / DeepSeek V4 Pro have no first-party listing, so the rules pick the OpenRouter price; oneatlas uses another feed for their intelligence scores |

@@ -54,7 +54,7 @@ function joinKey(lab: string, slug: string) {
   return `${l}/${s}`;
 }
 ```
-Apply `joinKey` to both canonical ids (`lab/slug`) and OpenRouter ids. **Measured with the baseline snapshots: 283 of 357 OpenRouter keys match, 5 ambiguous, 74 unmatched.** Ambiguity rule: prefer the canonical id whose raw `lab/slug` equals the OpenRouter id (after lower-casing), else the shortest slug; if still tied, leave unjoined and log. Variants: among OpenRouter entries sharing a key, prefer the one without a `:` suffix for specs; if only variants exist use the first.
+Apply `joinKey` to both canonical ids (`lab/slug`) and OpenRouter ids. **Measured with the baseline snapshots: 284 of 350 OpenRouter keys match, 5 ambiguous (all resolved), 66 unmatched.** (An earlier measurement said 283 of 357 / 74 unmatched: it still counted the 7 `openrouter/*` router ids, and predates the `ibm-granite` alias. `scripts/ingest/join.test.ts` pins the current numbers.) Ambiguity rule: prefer the canonical id whose raw `lab/slug` equals the OpenRouter id (after lower-casing), else the shortest slug; if still tied, leave unjoined and log. Variants: among OpenRouter entries sharing a key, prefer the one without a `:` suffix for specs; if only variants exist use the first.
 
 ### models.dev -> our tables
 
@@ -120,14 +120,16 @@ Display rank = `RANK() OVER (ORDER BY measure)` within the **filtered** set (tie
 
 | Table | Expected |
 |-------|----------|
-| Lab | 40 to 90 |
-| Model | 600 to 850 (about 658 canonical + about 74 OpenRouter-only) |
+| Lab | 40 to 100 (measured 91: 83 canonical labs + 8 labs that exist only on OpenRouter) |
+| Model | 600 to 850 (measured 724: 658 canonical + 66 OpenRouter-only) |
 | Model with `openrouterId` | >= 300 |
 | Provider | 200 to 324 |
 | ProviderModel | 7,500 to 8,700 |
 | Benchmark | >= 15 |
 | BenchmarkScore | >= 1,500 |
-| Models with `intelligenceIndex` | >= 150 |
+| Models with `intelligenceIndex` | >= 60 (measured 65 = every distinct model carrying `intelligence_index`; only 106 OpenRouter entries have it, many are `:batch`/`:free` variants) |
+
+Measured on the baseline (seed run twice, identical): Lab 91, Model 724, with `openrouterId` 350, Provider 307, ProviderModel 8,618, Benchmark 30, BenchmarkScore 1,964, intelligence 65. About 55 s per run on Neon.
 
 ### Stretch ingest (only after the MVP cut line)
 

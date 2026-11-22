@@ -13,7 +13,9 @@
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "ingest:fetch": "tsx scripts/ingest/fetch.ts",
+    "db:seed": "tsx scripts/ingest/seed.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.1",

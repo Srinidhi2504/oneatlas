@@ -21,12 +21,12 @@ Working agreement for Claude Code: take the first unchecked task, read the docs 
 ## P1 Data pipeline (`docs/04`)
 
 Files: `scripts/ingest/{fetch,normalize,join,seed}.ts`, `src/lib/labs.ts` (alias + name overrides), tests next to them. Add scripts `ingest:fetch`, `db:seed` to `package.json` (`tsx`, `import "dotenv/config"`).
-- [ ] `fetch.ts`: download both sources to `data/snapshots/`, update `MANIFEST.json` (counts, date). Keyless, with timeout + clear errors
-- [ ] `normalize.ts` + tests: Zod schemas for source rows; `perTokenToPerMillion`, partial dates, modalities, type mapping, search key
-- [ ] `join.ts` + tests: `joinKey`, alias map, ambiguity rule. **Test against the baseline snapshot: expect 283 matches / 5 ambiguous / 74 unmatched** (document any drift)
-- [ ] `seed.ts`: build canonical models, primary row, reference price, providerCount, OpenRouter enrichment, OpenRouter-only models, benchmarks catalogue + ranks, upsert/replace with long transaction timeouts
-- [ ] Run seed twice: counts identical; report printed; **all sanity bands in `04` met**
-- [ ] Spot-check 5 models against oneatlas.dev (Claude Opus 5.5, GLM-5.3, GPT OSS 120B, Kimi K3, DeepSeek V4 Pro): price, context, provider count within a small tolerance
+- [x] `fetch.ts`: download both sources to `data/snapshots/`, update `MANIFEST.json` (counts, date). Keyless, with timeout + clear errors
+- [x] `normalize.ts` + tests: Zod schemas for source rows; `perTokenToPerMillion`, partial dates, modalities, type mapping, search key
+- [x] `join.ts` + tests: `joinKey`, alias map, ambiguity rule. **Test against the baseline snapshot: expect 283 matches / 5 ambiguous / 74 unmatched** (document any drift). Done: 284 / 5 / 66; the 74 included 7 `openrouter/*` routers, +1 via the `ibm-granite` alias (see `03` log)
+- [x] `seed.ts`: build canonical models, primary row, reference price, providerCount, OpenRouter enrichment, OpenRouter-only models, benchmarks catalogue + ranks, upsert/replace with long transaction timeouts
+- [x] Run seed twice: counts identical; report printed; **all sanity bands in `04` met** (two bands corrected, see `03` log)
+- [x] Spot-check 5 models against oneatlas.dev (Claude Opus 5.5, GLM-5.3, GPT OSS 120B, Kimi K3, DeepSeek V4 Pro): price, context, provider count within a small tolerance
 
 ## P2 API (`docs/05`)
 

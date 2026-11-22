@@ -51,12 +51,18 @@ export async function listModels(query: ModelListQuery): Promise<Paginated<Model
   return { items: rows.map(toModelListItem), meta: listMeta(page, pageSize, total) };
 }
 
-/** Number of scored models per benchmark id, for "#rank of N". */
-async function benchmarkTotals(): Promise<Record<string, number>> {
+/** Per benchmark id: number of scored models (for "#rank of N") and the best value (for relative bars). */
+async function benchmarkTotals(): Promise<Record<string, { count: number; best: number }>> {
   "use cache";
   catalogCache();
-  const rows = await db.benchmarkScore.groupBy({ by: ["benchmarkId"], _count: { _all: true } });
-  return Object.fromEntries(rows.map((r) => [r.benchmarkId, r._count._all]));
+  const [rows, meta] = await Promise.all([
+    db.benchmarkScore.groupBy({ by: ["benchmarkId"], _count: { _all: true }, _max: { value: true }, _min: { value: true } }),
+    db.benchmark.findMany({ select: { id: true, higherIsBetter: true } }),
+  ]);
+  const higher = new Map(meta.map((b) => [b.id, b.higherIsBetter]));
+  return Object.fromEntries(
+    rows.map((r) => [r.benchmarkId, { count: r._count._all, best: (higher.get(r.benchmarkId) === false ? r._min.value : r._max.value) ?? 0 }]),
+  );
 }
 
 const GROUP_ORDER = ["Artificial Analysis", "Design Arena"];
@@ -134,7 +140,8 @@ async function findModelDetail(lab: string, slug: string): Promise<ModelDetail |
       value: s.value,
       winRate: s.winRate,
       rank: s.rank,
-      ofTotal: totals[s.benchmark.id] ?? 0,
+      ofTotal: totals[s.benchmark.id]?.count ?? 0,
+      best: totals[s.benchmark.id]?.best ?? s.value,
     }))
     .sort(compareBenchmarks);
   const inputs = m.listings.map((l) => num(l.inputPrice)).filter((v): v is number => v != null);

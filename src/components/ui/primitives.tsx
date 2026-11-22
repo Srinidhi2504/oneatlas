@@ -3,6 +3,9 @@ import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
+/** Responsive card grid (plain string: safe to import from server and client components). */
+export const cardGrid = "grid gap-3 sm:grid-cols-2 xl:grid-cols-3";
+
 type Variant = "primary" | "secondary" | "ghost";
 type Size = "sm" | "md";
 

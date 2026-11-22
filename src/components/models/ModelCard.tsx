@@ -22,7 +22,7 @@ export function ModelCard({ m }: { m: ModelListItem }) {
         </div>
         {daysSince(m.releasedAt) <= 30 ? <Badge tone="accent">New</Badge> : m.deprecated ? <Badge tone="warning">Deprecated</Badge> : null}
       </div>
-      <dl className="mt-4 grid grid-cols-3 gap-2 text-13">
+      <dl className="mt-4 grid grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)] gap-2 text-13">
         <div>
           <dt className="text-xs text-faint">Price /1M</dt>
           <dd className="mt-0.5">
@@ -68,4 +68,3 @@ export function ModelCardSkeleton() {
   );
 }
 
-export const cardGrid = "grid gap-3 sm:grid-cols-2 xl:grid-cols-3";

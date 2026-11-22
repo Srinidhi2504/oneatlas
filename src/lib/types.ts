@@ -50,6 +50,8 @@ export interface BenchmarkResult {
   winRate: number | null;
   rank: number;
   ofTotal: number;
+  /** best score on this benchmark across all models (for relative bars) */
+  best: number;
 }
 
 export interface ProviderListing {

@@ -1,3 +1,4 @@
+// GET /api/v1/explain/source: the lines around a citation, for the Ask panel's in-place source viewer.
 import { sourceQuerySchema } from "@/lib/schemas";
 import { sourceExcerpt } from "@/server/code-index";
 import { handler, ok, queryOf } from "@/server/http";

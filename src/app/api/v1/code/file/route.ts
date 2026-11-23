@@ -1,3 +1,4 @@
+// GET /api/v1/code/file?path=: one file from the build-time code snapshot (404 for anything outside it).
 import { NotFoundError } from "@/server/errors";
 import { codeFile } from "@/server/code-index";
 import { handler, ok, queryOf } from "@/server/http";

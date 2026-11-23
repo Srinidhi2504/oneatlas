@@ -31,3 +31,18 @@ export function codeFile(path: string): { path: string; lines: number; content: 
 
 export const codeSearch = (query: string, limit = 60) => searchHits(codeIndex(), query, "", limit);
 export const sourceExcerpt = (path: string, line: number, end?: number) => sourceWindow(codeIndex(), path, line, 12, end);
+
+export interface SourceArchive {
+  files: number;
+  bytes: number;
+  commit: string | null; // null when built without git and outside Vercel
+}
+
+/** Size and commit of public/oneatlas-source.zip (written next to the code index at build time), or null if missing. */
+export function sourceArchive(): SourceArchive | null {
+  try {
+    return JSON.parse(readFileSync(join(process.cwd(), "src/generated/source-archive.json"), "utf8")) as SourceArchive;
+  } catch {
+    return null; // e.g. a dev server started before the first `npm run codeindex`
+  }
+}

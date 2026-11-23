@@ -1,4 +1,5 @@
 "use client";
+// Button that copies a link and confirms in place (announced to screen readers).
 import { Check, Link2 } from "lucide-react";
 import { useState } from "react";
 import { buttonClass } from "./primitives";

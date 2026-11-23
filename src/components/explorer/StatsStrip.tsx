@@ -1,3 +1,4 @@
+// Catalog totals and capability coverage meters above the explorer.
 import Link from "next/link";
 import { Odometer } from "@/components/ui/Odometer";
 import { formatInteger } from "@/lib/format";

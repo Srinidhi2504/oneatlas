@@ -1,3 +1,4 @@
+// Tests for display formatting: prices, token counts, dates and integers.
 import { describe, expect, it } from "vitest";
 import { daysSince, formatDate, formatMoney, formatPrice, formatScore, formatTokens, plural } from "./format";
 

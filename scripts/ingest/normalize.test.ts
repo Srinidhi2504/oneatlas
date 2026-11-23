@@ -1,3 +1,4 @@
+// Tests for source-row normalisation: price units, partial dates, modalities, model types, search keys.
 import { describe, expect, it } from "vitest";
 import { competitionRanks } from "@/lib/ranking";
 import { toSearchKey } from "@/lib/search-key";

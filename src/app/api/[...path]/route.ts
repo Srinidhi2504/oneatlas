@@ -1,3 +1,4 @@
+// Catch-all for unknown /api/* paths: answers with the JSON error envelope instead of the HTML 404 page.
 import { fail } from "@/server/http";
 
 // Unknown /api/* paths answer with the JSON error envelope (docs/05) instead of the HTML 404 page.

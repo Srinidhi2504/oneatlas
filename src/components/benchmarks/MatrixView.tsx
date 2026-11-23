@@ -1,4 +1,5 @@
 "use client";
+// Benchmark score matrix: pick columns, filter by lab/type, sort by any column, best score per column highlighted.
 import * as Popover from "@radix-ui/react-popover";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { ArrowDown, Columns3, Table2, TriangleAlert } from "lucide-react";

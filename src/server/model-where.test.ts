@@ -1,3 +1,4 @@
+// Tests for the filter -> Prisma where builder, relevance sort and wildcard handling.
 import { escapeLike } from "@/lib/search-key";
 import { describe, expect, it } from "vitest";
 import { buildModelWhere, relevanceSort, without } from "./model-where";

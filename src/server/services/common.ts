@@ -1,3 +1,4 @@
+// Shared service helpers: the catalog cache profile/tag and per-model provider counts used by several services.
 import { cacheLife, cacheTag } from "next/cache";
 import { db } from "@/lib/db";
 import type { ModelListItem } from "@/lib/types";

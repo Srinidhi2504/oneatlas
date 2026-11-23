@@ -1,3 +1,4 @@
+// /labs/{slug}: a lab's stats, its models (sortable) and the providers that serve them.
 import { ChevronRight } from "lucide-react";
 import { HoverText } from "@/components/ui/HoverText";
 import type { Metadata } from "next";

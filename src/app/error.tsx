@@ -1,4 +1,5 @@
 "use client";
+// Route-level error boundary: a branded message with a retry button instead of a blank page.
 import { TriangleAlert } from "lucide-react";
 import { useEffect } from "react";
 import { Button, ButtonLink } from "@/components/ui/primitives";

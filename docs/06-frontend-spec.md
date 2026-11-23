@@ -16,7 +16,9 @@ Stack: Next.js 16 App Router, React 19, Tailwind 4, TanStack Query 5, nuqs 2. Ad
 | `/code?path=&line=` | Editor-style source viewer: tree, tabs, search, `Ctrl+P` quick open, line links | `codeTree()` (server), `/code/file`, `/code/search` |
 | `not-found`, `error`, `loading` | Branded states | none |
 
-Header: logo, nav (Models, Rankings, Benchmarks, Labs, Providers), search trigger (`Ctrl/Cmd+K`), Compare badge with count. Footer: data attributions, last-updated.
+Header: logo, nav (Models, Rankings, Benchmarks, Labs, Providers, Code; full nav from 1024 px, menu below), search trigger (`Ctrl/Cmd+K`), Compare badge with count, Ask the code, light/dark switch. Footer: data attributions, last-updated.
+
+**Code page (`/code`).** Editor-style viewer over the build-time snapshot: file tree with each file's purpose line, tabs, breadcrumbs, syntax highlighting, search, `Ctrl+P` quick open, shareable line links. Header actions: **View on GitHub** and **Download ZIP** (a plain `<a download>` to the static `/oneatlas-source.zip`, showing size and file count), plus the snapshot's commit linked to GitHub.
 
 ## Explorer (`/`)
 

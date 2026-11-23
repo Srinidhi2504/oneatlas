@@ -16,7 +16,7 @@ Working agreement for Claude Code: take the first unchecked task, read the docs 
 - [x] `typecheck`, `test`, `build` all pass on the scaffold
 - [x] Neon project `oneatlas` created (id `floral-glitter-43452264`, aws-us-east-1, Postgres 17). Pooled `DATABASE_URL` + direct `DIRECT_URL` are in the gitignored `.env`
 - [x] Init migration applied and verified on Neon: 6 tables + `_prisma_migrations`, `pg_trgm`, `Model_searchKey_trgm_idx`; pooled runtime connection tested
-- [ ] First commit on a `main` branch, create the GitHub repo, push (public, or grant access to reviewers)
+- [x] First commit on a `main` branch, create the GitHub repo, push: https://github.com/Srinidhi2504/oneatlas
 
 ## P1 Data pipeline (`docs/04`)
 
@@ -39,7 +39,7 @@ Files: `src/lib/schemas.ts`, `src/server/{http.ts,mappers.ts,services/*}`, `src/
 - [x] `labs`, `providers` endpoints
 - [x] `rankings/{board}` (all boards + benchmark keys, lab/type/capability filters, filtered `RANK()`), `benchmarks`, `benchmarks/matrix`, `compare`
 - [x] Verify with curl: every endpoint 200 on valid input, 400 on bad input (`pageSize=1000`, `type=foo`), 404 on unknown slug; list endpoint warm latency < 300 ms (note numbers for the Loom). Measured on `next start` locally: warm (cache hit) 2 to 6 ms on every endpoint; cache miss 0.5 to 0.9 s for lists, ~2 s for a cold detail page (mostly the round trips from this laptop to Neon us-east-1)
-- [ ] **Deploy checkpoint:** push, connect repo to Vercel, set env vars, confirm `/api/v1/health` on the live URL (`08`)
+- [ ] **Deploy checkpoint:** connect the repo to Vercel, set env vars, confirm `/api/v1/health` on the live URL. The author deploys manually; runbook in `08`
 
 ## P3 Core UI: explorer and detail (`docs/06`)
 
@@ -71,7 +71,7 @@ Files: `src/lib/schemas.ts`, `src/server/{http.ts,mappers.ts,services/*}`, `src/
 ## P6 Ship
 
 - [x] Real `README.md`: what/why, live URL, stack, architecture diagram (from `03`), data sources + attribution, setup (`npm i`, `.env`, `db:migrate`, `db:seed`, `dev`), API summary, decisions, limitations, what I'd do next
-- [ ] Final QA on the live URL (mobile too); `npm run typecheck && npm run lint && npm test && npm run build` clean; remove dead code; `.env` not committed
+- [ ] Final QA on the live URL (mobile too). Local gates done: typecheck, lint, unit, build and e2e clean; `.env` never committed; every source file documented; system and database design docs (`09`, `10`) written
 - [ ] Record the Loom using the outline in `08` (5 to 10 min)
 - [ ] Submit the Google Form (live URL, repo URL, Loom URL)
 

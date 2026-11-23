@@ -1,4 +1,5 @@
 "use client";
+// Light/dark theme switch; the choice is stored on <html data-theme> and in localStorage.
 import { Moon, Sun } from "lucide-react";
 import { THEME_KEY } from "./theme";
 

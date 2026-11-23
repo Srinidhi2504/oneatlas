@@ -1,4 +1,5 @@
 "use client";
+// Header button for "Ask the code" that lazy-loads the panel on first use, so it is not in every page's bundle.
 import { MessageSquareCode } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";

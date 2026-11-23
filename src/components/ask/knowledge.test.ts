@@ -1,3 +1,4 @@
+// Tests for the prepared answers: ordering, question matching, suggestions and anchor resolution.
 import { describe, expect, it } from "vitest";
 import { parseBlocks } from "./Markdown";
 import { KNOWLEDGE, matchQuestion, resolveAnchors, suggestQuestions, UNORDERED } from "./knowledge";

@@ -1,6 +1,6 @@
 # 04 Data model and ingestion
 
-Schema source of truth: `prisma/schema.prisma` (already validated; init migration at `prisma/migrations/20261122000000_init`, not yet applied to any database). Inputs: `data/snapshots/*.json` (see `02-research.md` section 3).
+Schema source of truth: `prisma/schema.prisma` (migrations in `prisma/migrations/`, applied to the production Neon database). Inputs: `data/snapshots/*.json` (see `02-research.md` section 3). This file covers what the data **means** and how it is ingested; the physical design (columns, constraints, indexes, query patterns) is in [`10-database-design.md`](10-database-design.md).
 
 ## ER diagram
 
@@ -25,7 +25,7 @@ erDiagram
 - Dates are `DATE`. Partial dates from sources ("2025-05") become the 1st of that month.
 - URL identity: `/models/{lab.slug}/{model.slug}` equals models.dev's `canonical_model_id` (`lab/slug`) for canonical models.
 
-## Ingestion pipeline (roadmap P1 builds this under `scripts/ingest/`)
+## Ingestion pipeline (`scripts/ingest/`)
 
 `npm run ingest:fetch` downloads both sources to `data/snapshots/` and rewrites `MANIFEST.json`. `npm run db:seed` reads **only the snapshots**. Both are idempotent.
 

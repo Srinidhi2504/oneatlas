@@ -1,3 +1,4 @@
+// Model service: the explorer list (filters, sorts, relevance), model detail, compare and per-benchmark totals.
 import type { Prisma } from "@/generated/prisma/client";
 import { db } from "@/lib/db";
 import type { ModelListQuery, ModelSort } from "@/lib/schemas";

@@ -1,4 +1,5 @@
 "use client";
+// A lab's model list with client-side sorting (the full list is already on the page).
 import { useState } from "react";
 import { ModelTable, type SortState } from "@/components/models/ModelTable";
 import { defaultOrder, type ModelSort } from "@/lib/types";

@@ -1,4 +1,5 @@
 "use client";
+// Header actions: search, compare badge, Ask the code, theme switch and the mobile menu; lazy-loads the palette.
 import * as Dialog from "@radix-ui/react-dialog";
 import { GitCompareArrows, Menu, Search, X } from "lucide-react";
 import dynamic from "next/dynamic";

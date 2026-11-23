@@ -1,3 +1,4 @@
+// End-to-end smoke tests (Playwright) against a production build: the core journeys a reviewer would click through.
 import { expect, test } from "@playwright/test";
 
 // The core journey, keyboard first where the UI promises shortcuts: explorer filter -> detail -> compare -> rankings.
@@ -77,6 +78,14 @@ test("code viewer opens a deep-linked file at the selected line", async ({ page 
   const body = page.getByRole("region", { name: "Contents of src/lib/pricing.ts" });
   await expect(body).toContainText("blended");
   await expect(page.getByRole("tab", { name: /pricing\.ts/ })).toBeVisible();
+
+  // the download is a static zip of the repository: check the link and that a real zip comes back
+  const download = page.getByRole("link", { name: /Download ZIP/ });
+  await expect(download).toHaveAttribute("href", "/oneatlas-source.zip");
+  const res = await page.request.get("/oneatlas-source.zip");
+  expect(res.status()).toBe(200);
+  const bytes = await res.body();
+  expect(bytes.subarray(0, 4).toString("hex")).toBe("504b0304"); // "PK\x03\x04": a zip local file header
 });
 
 test("ask the code loads on first open and plays a prepared answer; theme switches light/dark", async ({ page }) => {

@@ -1,3 +1,4 @@
+// GET /api/v1/search?q=: grouped models, labs and providers for the command palette.
 import { searchQuerySchema } from "@/lib/schemas";
 import { handler, ok, queryOf } from "@/server/http";
 import { search } from "@/server/services/catalog";

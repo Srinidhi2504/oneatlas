@@ -1,4 +1,5 @@
 "use client";
+// A provider's listings: search, sort and pagination through /api/v1/providers/{provider}, state in the URL.
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { SearchX, TriangleAlert } from "lucide-react";
 import Link from "next/link";

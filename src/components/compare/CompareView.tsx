@@ -1,4 +1,5 @@
 "use client";
+// Compare table: grouped rows, best value per row (labelled, not colour only), differences-only toggle, add/remove models.
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Check, GitCompareArrows, Minus, TriangleAlert, X } from "lucide-react";
 import Link from "next/link";

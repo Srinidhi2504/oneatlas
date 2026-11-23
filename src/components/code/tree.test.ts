@@ -1,3 +1,4 @@
+// Tests for the code viewer's file tree: nesting, folder-first ordering, ancestors and file badges.
 import { describe, expect, it } from "vitest";
 import { ancestors, buildTree, fileBadge } from "./tree";
 

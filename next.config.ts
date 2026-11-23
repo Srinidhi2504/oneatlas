@@ -1,3 +1,4 @@
+// Next.js config: Cache Components + partial prefetching, security headers (CSP etc.), and file tracing for build-time snapshots.
 import type { NextConfig } from "next";
 
 const isDev = process.env.NODE_ENV === "development";
@@ -34,12 +35,13 @@ const nextConfig: NextConfig = {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
   partialPrefetching: true,
-  // the "Ask the code" assistant reads this snapshot at runtime (scripts/build-code-index.ts); make sure it ships
+  // Build-time snapshots (scripts/build-code-index.ts) read with fs at runtime. File tracing cannot see fs reads,
+  // so list them explicitly or Vercel functions would be deployed without them.
   outputFileTracingIncludes: {
     "/api/v1/explain": ["./src/generated/code-index.json"],
     "/api/v1/explain/source": ["./src/generated/code-index.json"],
     "/api/v1/code/**": ["./src/generated/code-index.json"],
-    "/code": ["./src/generated/code-index.json"],
+    "/code": ["./src/generated/code-index.json", "./src/generated/source-archive.json"],
   },
   turbopack: {
     rules: {

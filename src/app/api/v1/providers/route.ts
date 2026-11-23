@@ -1,3 +1,4 @@
+// GET /api/v1/providers: the provider directory with model counts.
 import { providersQuerySchema } from "@/lib/schemas";
 import { handler, ok, queryOf } from "@/server/http";
 import { listProviders } from "@/server/services/directory";

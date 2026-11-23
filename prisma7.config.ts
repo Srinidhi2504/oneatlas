@@ -1,3 +1,4 @@
+// Prisma CLI config (migrate, generate, studio). The app itself connects through src/lib/db.ts, not this file.
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 

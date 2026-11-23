@@ -1,4 +1,5 @@
 "use client";
+// Explorer table: sortable headers (aria-sort), sticky model column, capability badges, compare checkboxes.
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import Link from "next/link";
 import { Badge, LabAvatar, Skeleton } from "@/components/ui/primitives";

@@ -1,4 +1,5 @@
 "use client";
+// Price vs intelligence chart wrapper: mounts the Recharts scatter only near the viewport, with a table fallback.
 import { useQuery } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
 import Link from "next/link";

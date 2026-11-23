@@ -1,3 +1,4 @@
+// /models/{lab}/{slug}: the model detail page (specs, pricing, cost calculator, benchmarks, ranks, provider listings).
 import { ChevronRight, Check, Minus } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";

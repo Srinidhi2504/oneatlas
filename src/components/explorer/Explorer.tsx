@@ -1,4 +1,5 @@
 "use client";
+// The model explorer: URL state (nuqs) drives TanStack Query calls to /api/v1/models and /facets, hydrated from SSR.
 import * as Dialog from "@radix-ui/react-dialog";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { ArrowDownUp, LayoutGrid, Rows3, SearchX, SlidersHorizontal, TriangleAlert, X } from "lucide-react";

@@ -1,4 +1,7 @@
+// Site header and footer. The footer carries data attributions and catalog freshness from a cached read.
+import Link from "next/link";
 import { formatDate, formatInteger } from "@/lib/format";
+import { REPO_URL } from "@/lib/site";
 import { getStats } from "@/server/services/catalog";
 import { HeaderActions } from "./HeaderActions";
 import { Logo } from "./Logo";
@@ -51,6 +54,16 @@ export async function Footer() {
             .
           </p>
           <p>Prices are USD per 1M tokens. Blended = (3 × input + output) / 4.</p>
+          <p>
+            <a className="underline decoration-border-strong underline-offset-2 hover:text-fg" href={REPO_URL} rel="noopener noreferrer">
+              Source on GitHub
+            </a>{" "}
+            or browse it in the{" "}
+            <Link className="underline decoration-border-strong underline-offset-2 hover:text-fg" href="/code">
+              code viewer
+            </Link>
+            .
+          </p>
         </div>
         <p className="sm:text-right">
           {formatInteger(stats.models)} models in {formatInteger(stats.listings)} API listings

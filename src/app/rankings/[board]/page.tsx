@@ -1,3 +1,4 @@
+// /rankings/{board}: one leaderboard with filters, podium, ranked table and the price vs intelligence chart.
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";

@@ -1,3 +1,4 @@
+// Root layout: fonts, theme bootstrap script, header/footer chrome, client providers and the compare tray.
 import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";

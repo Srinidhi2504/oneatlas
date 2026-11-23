@@ -1,4 +1,5 @@
 "use client";
+// Pointer-reactive text: letters near the cursor turn gold and grow (used on headings and intro text).
 import { Fragment, useEffect, useRef, type ElementType } from "react";
 import { cn } from "@/lib/cn";
 

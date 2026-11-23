@@ -1,4 +1,5 @@
 "use client";
+// Recharts scatter of log price vs intelligence with the value (Pareto) frontier traced and labelled.
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CartesianGrid, LabelList, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis } from "recharts";

@@ -1,3 +1,4 @@
+// Numbered pagination (links or callbacks) and the "page is past the end" state.
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";

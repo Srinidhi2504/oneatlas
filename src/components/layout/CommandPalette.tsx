@@ -1,4 +1,5 @@
 "use client";
+// Ctrl/Cmd+K command palette (cmdk in a Radix dialog): search models, labs and providers, jump to pages, ask the code.
 import * as Dialog from "@radix-ui/react-dialog";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Command } from "cmdk";

@@ -1,4 +1,5 @@
 "use client";
+// Client-side providers wrapped around the app: TanStack Query, the nuqs URL adapter and Radix tooltips.
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NuqsAdapter } from "nuqs/adapters/next/app";

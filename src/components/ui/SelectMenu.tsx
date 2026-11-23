@@ -1,4 +1,5 @@
 "use client";
+// Accessible single-choice select built on Radix (keyboard, typeahead, screen-reader semantics).
 import * as Select from "@radix-ui/react-select";
 import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/cn";

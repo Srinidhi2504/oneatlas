@@ -1,4 +1,5 @@
 "use client";
+// Monthly cost calculator: token volume presets or custom values priced at the reference and cheapest provider.
 import { Calculator } from "lucide-react";
 import Link from "next/link";
 import { useId, useState } from "react";

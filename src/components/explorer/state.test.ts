@@ -1,3 +1,4 @@
+// Tests that the explorer's URL state maps to the same API query the server renders (no refetch after hydration).
 import { describe, expect, it } from "vitest";
 import { modelListQuerySchema, paramsToObject } from "@/lib/schemas";
 import { effectiveSort, loadExplorerState, toApiQuery } from "./state";

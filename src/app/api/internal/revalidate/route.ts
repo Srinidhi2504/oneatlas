@@ -1,3 +1,4 @@
+// POST /api/internal/revalidate: bearer-protected cache bust after a re-seed (expires every `catalog`-tagged read).
 import { timingSafeEqual } from "node:crypto";
 import { revalidateTag } from "next/cache";
 import { fail, ok } from "@/server/http";

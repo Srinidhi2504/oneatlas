@@ -1,3 +1,4 @@
+// GET /api/v1/providers/{provider}: one provider and its paginated listings at that provider's own prices.
 import { providerModelsQuerySchema, slugSchema } from "@/lib/schemas";
 import { handler, ok, queryOf } from "@/server/http";
 import { getProvider } from "@/server/services/directory";

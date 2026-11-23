@@ -1,4 +1,5 @@
 "use client";
+// Leaderboard UI: board tabs, benchmark picker, filters, podium, ranked table and the labs-in-top-100 panel.
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Trophy, TriangleAlert } from "lucide-react";
 import Link from "next/link";

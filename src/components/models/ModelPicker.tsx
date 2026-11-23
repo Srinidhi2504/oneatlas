@@ -1,4 +1,5 @@
 "use client";
+// "Add model" popover used by the compare page: search as you type, pick with keyboard or mouse.
 import * as Popover from "@radix-ui/react-popover";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Command } from "cmdk";

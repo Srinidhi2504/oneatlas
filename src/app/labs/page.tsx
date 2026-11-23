@@ -1,3 +1,4 @@
+// /labs: the lab directory, server-rendered from the cached service and filtered in the browser.
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { LabsDirectory } from "@/components/directory/Directories";

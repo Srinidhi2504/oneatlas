@@ -1,4 +1,5 @@
 "use client";
+// Lab and provider directories: instant in-browser search and sort over the server-rendered list.
 import { ExternalLink, SearchX } from "lucide-react";
 import Link from "next/link";
 import { parseAsString, parseAsStringLiteral, useQueryStates } from "nuqs";

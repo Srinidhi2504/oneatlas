@@ -1,4 +1,5 @@
 "use client";
+// Main navigation links with the active route highlighted (shared by the header and the mobile menu).
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";

@@ -1,3 +1,4 @@
+// Home hero: headline, live catalog numbers, calls to action and the 3D globe.
 import { formatInteger } from "@/lib/format";
 import { getStats } from "@/server/services/catalog";
 import { ButtonLink } from "@/components/ui/primitives";

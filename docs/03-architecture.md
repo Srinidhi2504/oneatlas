@@ -2,29 +2,33 @@
 
 ## System at a glance
 
+This file is the decision record: what was decided, why, and every later deviation (the log at the bottom). The full system design (components, flows, caching layers, reliability, security, scaling) is in [`09-system-design.md`](09-system-design.md); the schema and indexes are in [`10-database-design.md`](10-database-design.md); the deployment runbook is [`08`](08-deploy-and-submission.md).
+
 ```mermaid
 flowchart LR
   subgraph Sources[Public sources, no key]
     MD[models.dev api.json]
     OR[OpenRouter /models]
   end
-  subgraph Ingest[scripts/ - run locally or CI]
-    F[fetch -> data/snapshots] --> N[normalise + Zod validate] --> J[join by canonical key] --> U[upsert in transaction] --> R[compute ranks + denormalised columns]
+  subgraph Ingest[scripts/ingest: run locally or in CI]
+    F[fetch -> data/snapshots] --> N[normalise + Zod validate] --> J[join by canonical key] --> U[upsert in one transaction] --> R[ranks + denormalised columns]
   end
   MD --> F
   OR --> F
   R --> DB[(Neon Postgres via Prisma 7)]
-  subgraph App[Next.js 16 on Vercel]
-    SVC[src/server/services: only code that touches Prisma]
+  subgraph App[Next.js 16 on Vercel, region iad1]
+    SVC[src/server/services: the only code that touches Prisma, 'use cache' + tag catalog]
     API[app/api/v1/**/route.ts: thin handlers]
     RSC[Server Components: static shell + Suspense]
-    CL[Client components: TanStack Query + nuqs]
+    CL[Client islands: TanStack Query + nuqs]
+    IDX[Build-time code snapshot: /code viewer, ZIP download, Ask the code]
   end
   DB --> SVC
   SVC --> API
   SVC --> RSC
   API --> CL
-  RSC -- initial data / hydrate --> CL
+  RSC -- initial data --> CL
+  IDX --> API
 ```
 
 ## Decisions (ADR-lite)
@@ -48,29 +52,38 @@ flowchart LR
 
 ```
 src/
-  app/
-    layout.tsx, page.tsx                  # explorer
-    models/[lab]/[slug]/page.tsx
-    compare/page.tsx
-    rankings/[board]/page.tsx             # /rankings redirects to /rankings/reach
-    benchmarks/page.tsx
-    labs/page.tsx, labs/[slug]/page.tsx
-    providers/page.tsx, providers/[slug]/page.tsx
-    api/v1/**/route.ts                    # thin handlers
-    not-found.tsx, error.tsx
-  server/
-    services/                             # models.ts, labs.ts, providers.ts, rankings.ts, benchmarks.ts, search.ts, stats.ts
-    mappers.ts                            # Prisma row -> DTO (Decimal->number, Date->ISO)
-    http.ts                               # ok(), fail(), handler wrapper: Zod parse, error envelope, cache headers
-  lib/
-    db.ts  pricing.ts  schemas.ts  format.ts  labs.ts(alias map)
-  components/                             # ui/, models/, layout/, charts/
-  generated/prisma                        # gitignored
+  app/                          # routes (App Router)
+    layout.tsx, page.tsx        #   root layout; / = hero + stats + explorer
+    models/[lab]/[slug]/        #   model detail
+    compare/  rankings/[board]/  benchmarks/  labs/[slug]/  providers/[slug]/  code/
+    api/v1/**/route.ts          #   REST API: thin handlers (parse -> service -> envelope)
+    api/internal/revalidate/    #   bearer-protected cache bust after a re-seed
+    api/[...path]/              #   JSON 404 for unknown API paths
+    not-found.tsx, error.tsx, globals.css
+  server/                       # server-only code
+    services/                   #   models, catalog (search/facets/stats/health), directory (labs/providers),
+                                #   rankings, benchmarks, common: the ONLY Prisma users, all 'use cache'
+    mappers.ts                  #   Prisma row -> DTO (Decimal -> number, Date -> ISO)
+    model-where.ts              #   filters -> Prisma where (pure, unit-tested)
+    http.ts  errors.ts          #   envelopes, handler wrapper, NotFoundError
+    rate-limit.ts               #   sliding-window limiter for POST /explain
+    code-index.ts               #   loader for the build-time code snapshot and archive metadata
+    explain/                    #   Live "Ask the code": Claude loop + read-only code tools
+  lib/                          # shared by server and client (client code never imports db.ts or Zod)
+    db.ts                       #   Prisma client (server only)
+    schemas.ts                  #   Zod request schemas (route handlers + pages)
+    types.ts pricing.ts ranking.ts format.ts search-key.ts labs.ts tones.ts site.ts api.ts compare-store.ts
+  components/                   # React: ui/ primitives, layout/, explorer/, models/, compare/, rankings/,
+                                #   benchmarks/, directory/, hero/, ask/, code/
+  generated/                    # gitignored: Prisma client, code-index.json, ask-anchors.json, source-archive.json
 scripts/
-  ingest/ fetch.ts normalize.ts join.ts seed.ts *.test.ts
-data/snapshots/                           # committed inputs
-docs/
-prisma/ schema.prisma, migrations/
+  ingest/                       # fetch.ts, normalize.ts, join.ts, seed.ts (+ tests)
+  build-code-index.ts, zip.ts   # build-time snapshots: code index, citations, public/oneatlas-source.zip
+data/snapshots/                 # committed source data (the seed's only input)
+prisma/                         # schema.prisma, migrations/
+e2e/                            # Playwright smoke spec
+docs/                           # 01..10 (this folder)
+vercel.json                     # function region (iad1, next to the database)
 ```
 
 ## Request flows
@@ -112,7 +125,7 @@ prisma/ schema.prisma, migrations/
 
 ## Security notes
 
-Read-only public API; inputs validated and bounded; no raw SQL string interpolation (use `Prisma.sql` / parameterised `$queryRaw`); no secrets in the repo; internal revalidate endpoint requires a bearer secret.
+Read-only public API; every input validated and bounded with Zod; LIKE wildcards escaped; only parameterised raw SQL; no secrets in the repo or the browser bundle; security headers (CSP, HSTS, nosniff, frame denial) on every response; the internal revalidate endpoint needs a bearer secret and the assistant endpoint is rate-limited and size-capped. Details: [`09` section 6](09-system-design.md#6-security).
 
 ## Decision log (append here when you deviate from the docs)
 
@@ -178,3 +191,8 @@ Read-only public API; inputs validated and bounded; no raw SQL string interpolat
 | 2026-11-23 | Rollback for the palette: `git tag palette-v1-teal`, or copy `docs/palettes/v1-teal-graphite.css` over the token blocks at the top of `globals.css` (plus `themeColor` in `layout.tsx` and the fallback colours in `AtlasGlobe.tsx`) | Colours live in tokens, so reverting is a single-file change |
 | 2026-11-23 | Palette changed again to "gold, black and warm white": near-black `#0b0b0c` / off-white `#fcfcfb` neutrals, antique-gold accent (`#7a5800` light for 6:1 text and white-on-gold buttons, `#d9ad45` dark). Text pairs >= 5.2:1 | Author asked for gold, white and black. The indigo version is kept: `git tag palette-v2-indigo`, `docs/palettes/v2-ink-indigo.css` (v1 teal: `palette-v1-teal`) |
 | 2026-11-23 | Hover text effect (`components/ui/HoverText.tsx`): headings and intro text split into letters; letters near the mouse turn gold and scale up (Gaussian falloff by distance, sigma = 0.85 x font size). JS only sets one CSS variable `--i` per letter per animation frame; CSS turns it into `scale()` and colour with transitions. Skipped for touch and `prefers-reduced-motion`; screen readers read a visually hidden copy | Ported from the portfolio project's per-letter hover (which used GSAP font-weight animation). Transform-only, so no layout shift, no new dependency, no re-render on pointer move. Applied to the hero, page titles and descriptions, section titles, "Browse models" |
+| 2026-11-23 | `/code` offers **Download ZIP**: `scripts/build-code-index.ts` zips every git-visible file (the runnable repo, incl. lockfile and data snapshots) into `public/oneatlas-source.zip` with an in-house ZIP writer (`scripts/zip.ts`, Node `zlib` deflate + crc32, tested) | A static file the CDN serves costs no function time and is exactly the deployed commit; no zip dependency for ~90 lines of format code |
+| 2026-11-23 | The build script falls back to a filesystem walk with a deny list when `.git` is missing, and reads the commit from `VERCEL_GIT_COMMIT_SHA` | Vercel checks out sources without `.git`; verified the walk yields the same 157 code-index files as `git ls-files` |
+| 2026-11-23 | Vercel prep: `vercel.json` pins functions to `iad1` (next to Neon `aws-us-east-1`); `engines.node` = `24.x` (was `>=22`, which Vercel resolves with a warning) | Same-region DB round trips; deterministic runtime matching the verified local version |
+| 2026-11-23 | Every source file starts with a one-line purpose comment | Readable codebase for reviewers; the `/code` tree and the assistant's project map show it per file |
+| 2026-11-23 | Added `09-system-design.md` and `10-database-design.md`; rewrote `08` as a Vercel runbook | System design and database design as standalone references; `03` stays the decision record |

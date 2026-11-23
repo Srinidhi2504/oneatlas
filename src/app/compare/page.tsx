@@ -1,3 +1,4 @@
+// /compare?ids=: side-by-side comparison of 2 to 4 models; ids live in the URL so a comparison is shareable.
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { CompareView } from "@/components/compare/CompareView";

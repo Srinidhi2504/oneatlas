@@ -1,3 +1,4 @@
+// OneAtlas wordmark: a meridian globe glyph and the name, linking home.
 import Link from "next/link";
 
 /** Wordmark: a meridian globe (an atlas, not a sparkle) + the name. */

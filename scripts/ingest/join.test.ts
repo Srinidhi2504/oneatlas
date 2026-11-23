@@ -1,3 +1,4 @@
+// Tests for the OpenRouter <-> models.dev join key, pinned against the committed snapshots (284 matched / 5 ambiguous / 66 unmatched).
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { isSkippableOpenRouterId, joinIds, joinKey } from "./join";

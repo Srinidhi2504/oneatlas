@@ -1,3 +1,4 @@
+// Tests for the assistant's Markdown subset: blocks, citations and safe link schemes.
 import { describe, expect, it } from "vitest";
 import { CITATION, parseBlocks, safeHref } from "./Markdown";
 

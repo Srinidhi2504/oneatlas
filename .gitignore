@@ -49,3 +49,6 @@ next-env.d.ts
 # playwright
 /test-results
 /playwright-report
+
+# generated at build time by scripts/build-code-index.ts
+/public/oneatlas-source.zip

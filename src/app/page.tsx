@@ -1,3 +1,4 @@
+// / (home): hero, catalog stats and the model explorer, whose first page is server-rendered from the same query as the API.
 import { Suspense } from "react";
 import { HoverText } from "@/components/ui/HoverText";
 import { Explorer, type ExplorerInitial } from "@/components/explorer/Explorer";

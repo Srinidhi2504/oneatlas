@@ -1,4 +1,5 @@
 "use client";
+// Hero button that opens the "Ask the code" panel.
 import { MessageSquareCode } from "lucide-react";
 import { openAsk } from "@/components/ask/ask-events";
 import { buttonClass } from "@/components/ui/primitives";

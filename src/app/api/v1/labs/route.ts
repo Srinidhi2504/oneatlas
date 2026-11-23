@@ -1,3 +1,4 @@
+// GET /api/v1/labs: the lab directory with model counts and latest release.
 import { labsQuerySchema } from "@/lib/schemas";
 import { handler, ok, queryOf } from "@/server/http";
 import { listLabs } from "@/server/services/directory";

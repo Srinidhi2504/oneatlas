@@ -1,3 +1,4 @@
+// Playwright config: one Chromium project against `next start` on port 3300, or E2E_BASE_URL for a deployed site.
 import { defineConfig, devices } from "@playwright/test";
 
 // One smoke spec against a production build: `npm run build && npm run test:e2e`.

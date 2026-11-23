@@ -1,4 +1,5 @@
 "use client";
+// Model card for the explorer's card view: price, context, capabilities, intelligence, add to compare.
 import Link from "next/link";
 import { Badge, LabAvatar, Skeleton } from "@/components/ui/primitives";
 import { Tilt } from "@/components/ui/Tilt";

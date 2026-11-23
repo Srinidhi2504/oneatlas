@@ -1,3 +1,4 @@
+// /api/v1/explain: GET says whether Live mode is configured; POST streams a Claude answer about this codebase (NDJSON).
 import { connection } from "next/server";
 import { explainRequestSchema } from "@/lib/schemas";
 import { explain, isConfigured, type ExplainEvent } from "@/server/explain/assistant";

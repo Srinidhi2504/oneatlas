@@ -1,3 +1,4 @@
+// Tests for price math: blended price, value score, monthly cost and cheapest listing.
 import { describe, expect, it } from "vitest";
 import { blendedPrice, cheapestListing, monthlyCost, perTokenToPerMillion, valueScore } from "./pricing";
 

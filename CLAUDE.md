@@ -15,7 +15,8 @@ Evaluation for this role: **architecture, integration, reliability, scalability,
 | 3 | `docs/04-data-model-and-ingestion.md` | Schema semantics, source mapping, the ingestion algorithm. |
 | 4 | `docs/05-api-spec.md` | The API contract. Backend and frontend both build against it. |
 | 5 | `docs/06-frontend-spec.md` | Routes, components, UX, URL state. |
-| 6 | `docs/01-requirements.md`, `02-research.md`, `08-deploy-and-submission.md` | Rubric, evidence behind decisions, deploy + Loom. |
+| 6 | `docs/09-system-design.md`, `docs/10-database-design.md` | System design (flows, caching, reliability, security, scaling) and physical database design. |
+| 7 | `docs/01-requirements.md`, `02-research.md`, `08-deploy-and-submission.md` | Rubric, evidence behind decisions, Vercel runbook + Loom. |
 
 If code and docs disagree, fix whichever is wrong and note it in the decision log. Do not silently drift.
 
@@ -24,7 +25,7 @@ If code and docs disagree, fix whichever is wrong and note it in the decision lo
 - **Next.js 16.4** (App Router, `cacheComponents: true`), React 19.3, Tailwind 4.3, **TypeScript ~5.9** (NOT 7.x: `typescript-eslint` supports `<6.1`).
 - **Prisma 7.x** (`prisma@7`, `@prisma/client@7`, `@prisma/adapter-pg`). NOT 8 (npm `latest` is the 8 RC; ignore the "update available" banner).
 - PostgreSQL on Neon (pooled URL at runtime, direct URL for migrations). Zod 4, TanStack Query 5, nuqs 2, Vitest 5, tsx.
-- Package manager: **npm** (pnpm is not installed). Node >= 22.
+- Package manager: **npm** (pnpm is not installed). Node 24 (`engines.node` = `24.x`, which Vercel uses).
 
 ## Commands
 
@@ -37,8 +38,12 @@ npm test             # vitest run
 npm run db:generate  # prisma generate -> src/generated/prisma (gitignored, rebuild after schema edits and after clone)
 npm run db:migrate   # prisma migrate dev
 npm run db:deploy    # prisma migrate deploy (prod)
+npm run ingest:fetch # refresh data/snapshots from models.dev + OpenRouter
+npm run db:seed      # validate, join and load data/snapshots into Postgres (idempotent, ~1 min)
+npm run codeindex    # rebuild code-index.json, ask-anchors.json and public/oneatlas-source.zip (also runs on install/dev/build)
+npm run test:e2e     # Playwright smoke spec against next start on :3300 (run npm run build first)
 ```
-Scripts `ingest:fetch` and `db:seed` do not exist yet: roadmap P1 creates them.
+Deploy: Vercel, manual import of https://github.com/Srinidhi2504/oneatlas (runbook: `docs/08`). `vercel.json` pins functions to iad1, next to Neon us-east-1.
 
 ## Rules that prevent the known traps
 

@@ -1,3 +1,4 @@
+// /providers/{slug}: one provider's details and every model it serves at its own prices.
 import { BookOpen, ChevronRight, Globe } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";

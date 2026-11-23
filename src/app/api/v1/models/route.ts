@@ -1,3 +1,4 @@
+// GET /api/v1/models: the explorer list: search, filters, sort and pagination over the whole catalog.
 import { modelListQuerySchema } from "@/lib/schemas";
 import { handler, ok, queryOf } from "@/server/http";
 import { listModels } from "@/server/services/models";

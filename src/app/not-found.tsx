@@ -1,3 +1,4 @@
+// Branded 404 page with routes back into the catalog.
 import { Compass } from "lucide-react";
 import { ButtonLink } from "@/components/ui/primitives";
 

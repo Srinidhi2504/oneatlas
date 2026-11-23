@@ -1,3 +1,4 @@
+// Tests for competition ranking (ties share a rank) and the price/intelligence Pareto frontier.
 import { describe, expect, it } from "vitest";
 import { competitionRanks, paretoFrontier } from "./ranking";
 

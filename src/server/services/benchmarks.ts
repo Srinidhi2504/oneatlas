@@ -1,3 +1,4 @@
+// Benchmark service: catalogue with leaders and the paginated models x benchmarks score matrix (cached reads).
 import { db } from "@/lib/db";
 import type { MatrixQuery } from "@/lib/schemas";
 import type { BenchmarkInfo, BenchmarkSummary, ListMeta, Matrix } from "@/lib/types";

@@ -1,4 +1,5 @@
 "use client";
+// Accessible tooltip built on Radix: opens on hover and on keyboard focus.
 import * as Tooltip from "@radix-ui/react-tooltip";
 import type { ReactNode } from "react";
 

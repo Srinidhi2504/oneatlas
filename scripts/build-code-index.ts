@@ -1,13 +1,22 @@
-// Snapshot the project's own source + docs into src/generated/code-index.json for the "Ask the code" assistant.
-// Runs on install, dev and build (package.json), so the deployed index always matches the deployed code.
-// Only git-visible files (tracked or untracked-but-not-ignored) under the allow-list: never .env, data snapshots, generated code.
+// Build-time snapshots of the project itself. Runs on install, dev and build (package.json), so what the site shows
+// always matches the deployed code. Outputs:
+//   1. src/generated/code-index.json    allow-listed source + docs, read by "Ask the code" and the /code viewer
+//   2. src/generated/ask-anchors.json   the prepared answers' {{path|text}} citations resolved to line numbers
+//   3. public/oneatlas-source.zip       the whole repository as a download (+ src/generated/source-archive.json)
+// Only git-visible files (tracked, or untracked but not ignored), so .env and other ignored files never get in.
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { ANCHOR, KNOWLEDGE } from "../src/components/ask/knowledge";
+import { createZip } from "./zip";
 
-const INCLUDE = /^(src|scripts|e2e|prisma|docs)\/|^(README\.md|CLAUDE\.md|package\.json|next\.config\.ts|prisma7\.config\.ts|playwright\.config\.ts|vitest\.config\.mts|tsconfig\.json|\.env\.example)$/;
+// What the code viewer and the assistant may read: source, tests, docs, config. Not data snapshots or lockfiles.
+const INCLUDE = /^(src|scripts|e2e|prisma|docs)\/|^(README\.md|CLAUDE\.md|package\.json|next\.config\.ts|prisma7\.config\.ts|playwright\.config\.ts|vitest\.config\.mts|tsconfig\.json|vercel\.json|\.env\.example)$/;
 const EXCLUDE = /^src\/generated\/|\.(ico|svg|png|jpg)$|^docs\/CLAUDE-CODE-PROMPT\.md$|(^|\/)\.env(?!\.example)/;
 const MAX_FILE_BYTES = 200_000;
+
+// Never shipped anywhere, even if a listing were to include them (belt and braces for the no-git fallback walk).
+const DENY = /^(node_modules|\.next|\.git|\.vercel|test-results|playwright-report|coverage|src\/generated|public\/oneatlas-source\.zip)(\/|$)|(^|\/)\.env(?!\.example$)|\.tsbuildinfo$|^next-env\.d\.ts$/;
+const ARCHIVE_PATH = "public/oneatlas-source.zip";
 
 /** First line of the file's leading comment: a one-line purpose for the project map. */
 export function leadingComment(text: string): string | null {
@@ -21,19 +30,52 @@ export function leadingComment(text: string): string | null {
   return null;
 }
 
-function trackedFiles(): string[] {
+/** Every repository file: git's view when available, else a filesystem walk that skips the deny-listed folders. */
+function repoFiles(): string[] {
   try {
-    return execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).split("\n").filter(Boolean);
+    return execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] })
+      .split("\n")
+      .filter((p) => p && !DENY.test(p));
   } catch {
-    // no git metadata (some CI/deploy builds): walk the same allow-listed folders instead
-    const dirs = ["src", "scripts", "e2e", "prisma", "docs"].filter((d) => existsSync(d));
-    const nested = dirs.flatMap((d) => readdirSync(d, { recursive: true, withFileTypes: true }).filter((e) => e.isFile()).map((e) => `${e.parentPath}/${e.name}`.replace(/\\/g, "/")));
-    return [...nested, ...readdirSync(".").filter((f) => INCLUDE.test(f))];
+    // no git metadata (Vercel and some CI builds check out the source without .git): walk the tree instead
+    const out: string[] = [];
+    const walk = (dir: string) => {
+      for (const e of readdirSync(dir || ".", { withFileTypes: true })) {
+        const path = dir ? `${dir}/${e.name}` : e.name;
+        if (DENY.test(path)) continue;
+        if (e.isDirectory()) walk(path);
+        else if (e.isFile()) out.push(path);
+      }
+    };
+    walk("");
+    return out.sort();
   }
 }
 
+/** The commit being built: Vercel exposes it as an env var (there is no .git there); locally, ask git. */
+function currentCommit(): string | null {
+  if (process.env.VERCEL_GIT_COMMIT_SHA) return process.env.VERCEL_GIT_COMMIT_SHA;
+  try {
+    return execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim() || null;
+  } catch {
+    return null;
+  }
+}
+
+/** Zip the whole repository under a top-level oneatlas/ folder; public/ is served by the CDN, no function involved. */
+function writeArchive(paths: string[]) {
+  const zip = createZip(paths.map((p) => ({ path: `oneatlas/${p}`, data: readFileSync(p) })));
+  mkdirSync("public", { recursive: true });
+  writeFileSync(ARCHIVE_PATH, zip);
+  // size + commit for the /code page's download button (separate file: code-index.json must stay byte-stable)
+  const meta = { files: paths.length, bytes: zip.length, commit: currentCommit() };
+  writeFileSync("src/generated/source-archive.json", JSON.stringify(meta));
+  console.log(`source archive: ${paths.length} files, ${Math.round(zip.length / 1024)} KB -> ${ARCHIVE_PATH}`);
+}
+
 function main() {
-  const files = trackedFiles()
+  const all = repoFiles();
+  const files = all
     .filter((p) => INCLUDE.test(p) && !EXCLUDE.test(p))
     .sort()
     .flatMap((path) => {
@@ -46,6 +88,8 @@ function main() {
   writeFileSync("src/generated/code-index.json", JSON.stringify({ files }));
   const bytes = files.reduce((n, f) => n + f.content.length, 0);
   console.log(`code index: ${files.length} files, ${Math.round(bytes / 1024)} KB -> src/generated/code-index.json`);
+
+  writeArchive(all);
 
   // Resolve the prepared answers' {{path|text}} anchors to line numbers. A missing file or text fails the build:
   // the prepared answers must never cite code that has moved or disappeared.

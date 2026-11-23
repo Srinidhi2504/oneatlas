@@ -1,3 +1,4 @@
+// Theme storage key and the inline script that applies a saved theme before first paint (no flash).
 export const THEME_KEY = "oneatlas:theme";
 
 /**

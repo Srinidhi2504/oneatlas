@@ -1,3 +1,4 @@
+// Tests for the sliding-window rate limiter.
 import { describe, expect, it } from "vitest";
 import { createRateLimiter } from "./rate-limit";
 

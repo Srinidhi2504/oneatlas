@@ -1,3 +1,4 @@
+// Tests for the assistant's read-only code tools: file listing, reading, search and source windows.
 import { describe, expect, it } from "vitest";
 import { leadingComment } from "../../../scripts/build-code-index";
 import { listFiles, projectMap, readFile, searchCode, sourceWindow, type IndexedFile } from "./code-tools";

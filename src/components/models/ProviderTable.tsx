@@ -1,4 +1,5 @@
 "use client";
+// A model's provider listings: each provider's own prices, limits and flags, sortable.
 import { ArrowDown, ArrowUp, ArrowUpDown, Check, Minus } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";

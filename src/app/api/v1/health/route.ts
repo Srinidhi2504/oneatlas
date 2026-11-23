@@ -1,3 +1,4 @@
+// GET /api/v1/health: liveness + DB ping for uptime checks and the post-deploy smoke test. Never cached.
 import { unstable_rethrow } from "next/navigation";
 import { fail, ok } from "@/server/http";
 import { getHealth } from "@/server/services/catalog";

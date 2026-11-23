@@ -1,4 +1,5 @@
 "use client";
+// Compare selection UI: the add-to-compare toggle and the floating tray (state in compare-store).
 import { Check, GitCompareArrows, Plus, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";

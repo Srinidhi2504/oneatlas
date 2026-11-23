@@ -1,3 +1,4 @@
+// Tests for request validation: CSV params, bounds, defaults, bad enums, unknown params.
 import { describe, expect, it } from "vitest";
 import {
   compareQuerySchema,

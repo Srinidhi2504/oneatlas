@@ -1,3 +1,4 @@
+// /benchmarks: the benchmark catalogue (server-rendered) and the interactive score matrix.
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";

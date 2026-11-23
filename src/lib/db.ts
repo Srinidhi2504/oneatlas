@@ -1,3 +1,4 @@
+// The Prisma client (one per server process): pg driver adapter, bounded pool, retries on connection-level errors.
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generated/prisma/client";
 

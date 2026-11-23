@@ -1,3 +1,4 @@
+// Tests for the in-house syntax highlighter: token types per language and lossless round-trips.
 import { describe, expect, it } from "vitest";
 import { highlight, languageOf } from "./highlight";
 

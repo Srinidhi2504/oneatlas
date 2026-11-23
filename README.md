@@ -191,6 +191,10 @@ curl "localhost:3000/api/v1/models/nope/nothing"     # 404 NOT_FOUND
 | [09 System design](docs/09-system-design.md) | Components, flows, caching, reliability, security, performance, scaling |
 | [10 Database design](docs/10-database-design.md) | ERD, table dictionary, constraints, indexes per query, migrations |
 
+## Demo video
+
+`demo/oneatlas-tour/` holds a scripted walkthrough: [`oneatlas-tour.yaml`](demo/oneatlas-tour/oneatlas-tour.yaml) is an [ndemo](https://github.com/splitbrain/ndemo) playbook that drives the site in a real browser and renders a silent 1080p video, and [`SCRIPT.md`](demo/oneatlas-tour/SCRIPT.md) is the voiceover (architecture, features, decisions, challenges) with one section per scene. To re-render: clone ndemo into `.claude/skills/ndemo`, `npm install && npm run build` there, start `npm run start -- --port 3300`, then `node .claude/skills/ndemo/ndemo render <absolute path to the yaml>`.
+
 ## Data sources and attribution
 
 Model, provider and price data come from [models.dev](https://models.dev). Descriptions and benchmark feeds come from [OpenRouter](https://openrouter.ai/models). Benchmarks are by [Artificial Analysis](https://artificialanalysis.ai) and [Design Arena](https://www.designarena.ai). Lab "logos" are generated initials; no third-party logos or assets are used. All data is public and keyless; snapshots are dated in `data/snapshots/MANIFEST.json`.

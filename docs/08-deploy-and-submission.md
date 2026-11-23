@@ -88,6 +88,8 @@ The last call expires every cached catalog read at once. Without `REVALIDATE_SEC
 
 ## Loom outline (target 8 minutes; 5 to 10 is required)
 
+The recording is scripted: [`demo/oneatlas-tour/SCRIPT.md`](../demo/oneatlas-tour/SCRIPT.md) is the voiceover, and `demo/oneatlas-tour/demo.mp4` is the matching silent video rendered by ndemo from [`oneatlas-tour.yaml`](../demo/oneatlas-tour/oneatlas-tour.yaml) (play it and read along while recording). The table below is the outline it follows.
+
 | Time | Show | Say |
 |------|------|-----|
 | 0:00 | Live site home | What OneAtlas is, who it is for, what it covers (724 models, 307 providers, 30 benchmarks) |

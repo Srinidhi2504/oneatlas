@@ -1,0 +1,470 @@
+titleCard:
+  title: "OneAtlas"
+  subtitle: "Every AI model, mapped. Full Stack Engineer take-home"
+  duration: 4000
+app:
+  url: "http://localhost:3300/"
+  viewport:
+    width: 1920
+    height: 1080
+  scale: 1
+  zoom: 1.25
+  colorScheme: "dark"
+tts:
+  provider: "openai"
+  voice: "alloy"
+  speed: 1
+recording:
+  outputDir: "."
+  fps: 30
+segments:
+  - id: "intro"
+    intent: "Home hero; the cursor sweeps the headline so the letters glow gold."
+    actions:
+      - type: "wait"
+        duration: 2500
+      - type: "hover"
+        target:
+          selector: "h1 .hover-letter >> visible=true >> nth=1"
+      - type: "wait"
+        duration: 1200
+      - type: "hover"
+        target:
+          selector: "h1 .hover-letter >> visible=true >> nth=9"
+      - type: "wait"
+        duration: 1200
+      - type: "hover"
+        target:
+          selector: "h1 .hover-letter >> visible=true >> nth=16"
+      - type: "wait"
+        duration: 1200
+      - type: "hover"
+        target:
+          role: "link"
+          name: "Explore models"
+      - type: "wait"
+        duration: 18800
+    timing: "after"
+    audioDuration: 0
+    videoDuration: 26885
+  - id: "stats"
+    intent: "Scroll to the live catalog stats strip."
+    actions:
+      - type: "scroll"
+        target:
+          selector: "[aria-label='Catalog overview'] >> visible=true"
+      - type: "hover"
+        target:
+          role: "meter"
+          name: "Tool calling coverage"
+      - type: "wait"
+        duration: 19600
+    timing: "after"
+    audioDuration: 0
+    videoDuration: 20123
+  - id: "search"
+    intent: "Type the typo query gpt4o into the explorer search; GPT-4o appears."
+    actions:
+      - type: "click"
+        target:
+          role: "searchbox"
+          name: "Search models"
+      - type: "type"
+        target:
+          role: "searchbox"
+          name: "Search models"
+        text: "gpt4o"
+        delay: 140
+        done:
+          stable: 800
+      - type: "scroll"
+        target:
+          selector: "tbody tr >> visible=true >> nth=2"
+      - type: "wait"
+        duration: 18400
+    timing: "after"
+    audioDuration: 0
+    videoDuration: 21510
+  - id: "filters"
+    intent: "Clear the search, enable Tool calling, tick Anthropic; counts and rows update."
+    actions:
+      - type: "type"
+        target:
+          role: "searchbox"
+          name: "Search models"
+        text: " "
+        delay: 60
+      - type: "press"
+        key: "Backspace"
+        done:
+          stable: 800
+      - type: "wait"
+        duration: 2000
+      - type: "click"
+        target:
+          role: "button"
+          name: "Tool calling"
+        done:
+          stable: 800
+      - type: "wait"
+        duration: 3000
+      - type: "click"
+        target:
+          role: "checkbox"
+          name: "Anthropic"
+        done:
+          stable: 1000
+      - type: "wait"
+        duration: 20300
+    timing: "after"
+    audioDuration: 0
+    videoDuration: 30514
+  - id: "model-detail"
+    intent: "Open Claude Opus 5.5; stat tiles, pricing, cost calculator, benchmarks."
+    actions:
+      - type: "click"
+        target:
+          selector: "table a[href='/models/anthropic/claude-opus-5-5'] >> visible=true >> nth=0"
+        done:
+          url: "**/models/anthropic/claude-opus-5-5"
+      - type: "wait"
+        duration: 6000
+      - type: "scroll"
+        target:
+          selector: "#benchmarks >> visible=true"
+      - type: "wait"
+        duration: 7000
+    timing: "after"
+    audioDuration: 0
+    videoDuration: 13720
+  - id: "detail-providers"
+    intent: "Scroll to the provider listings table, each provider at its own price."
+    actions:
+      - type: "scroll"
+        target:
+          selector: "#providers >> visible=true"
+      - type: "wait"
+        duration: 16500
+    timing: "after"
+    audioDuration: 0
+    videoDuration: 16549
+  - id: "compare"
+    intent: "Add to compare, Ctrl+K to GPT-5.5, add it, open the compare page."
+    actions:
+      - type: "scroll"
+        target:
+          selector: "button:has-text('Add to compare') >> visible=true >> nth=0"
+      - type: "click"
+        target:
+          selector: "button:has-text('Add to compare') >> visible=true >> nth=0"
+      - type: "wait"
+        duration: 1200
+      - type: "press"
+        key: "Control+K"
+      - type: "type"
+        target:
+          placeholder: "Search models, labs, providers…"
+        text: "GPT-5.5"
+        delay: 110
+        done:
+          stable: 800
+      - type: "click"
+        target:
+          role: "option"
+          name: "GPT-5.5 OpenAI"
+        done:
+          url: "**/models/openai/gpt-5.5"
+      - type: "wait"
+        duration: 1500
+      - type: "click"
+        target:
+          selector: "button:has-text('Add to compare') >> visible=true >> nth=0"
+      - type: "wait"
+        duration: 1000
+      - type: "click"
+        target:
+          role: "link"
+          name: "Compare 2"
+        done:
+          url: "**/compare?ids=**"
+      - type: "wait"
+        duration: 14300
+    timing: "after"
+    audioDuration: 0
+    videoDuration: 23364
+  - id: "rankings"
+    intent: "Rankings, switch to the Best value board, scroll to the price vs intelligence chart."
+    actions:
+      - type: "click"
+        target:
+          selector: "nav[aria-label='Main'] a[href='/rankings/reach'] >> visible=true"
+        done:
+          url: "**/rankings/reach"
+      - type: "click"
+        target:
+          selector: "[aria-label='Compare selection'] button:has-text('Clear') >> visible=true"
+      - type: "wait"
+        duration: 2500
+      - type: "click"
+        target:
+          selector: "nav[aria-label='Leaderboards'] a[href='/rankings/value'] >> visible=true"
+        done:
+          url: "**/rankings/value"
+      - type: "wait"
+        duration: 6000
+      - type: "scroll"
+        target:
+          selector: "#scatter >> visible=true"
+      - type: "wait"
+        duration: 7900
+    timing: "after"
+    audioDuration: 0
+    videoDuration: 18545
+  - id: "benchmarks"
+    intent: "Benchmarks catalogue, then the score matrix."
+    actions:
+      - type: "click"
+        target:
+          selector: "nav[aria-label='Main'] a[href='/benchmarks'] >> visible=true"
+        done:
+          url: "**/benchmarks"
+      - type: "wait"
+        duration: 4000
+      - type: "scroll"
+        target:
+          selector: "#matrix >> visible=true"
+      - type: "wait"
+        duration: 8600
+    timing: "after"
+    audioDuration: 0
+    videoDuration: 13321
+  - id: "directories"
+    intent: "Labs directory, then providers."
+    actions:
+      - type: "click"
+        target:
+          selector: "nav[aria-label='Main'] a[href='/labs'] >> visible=true"
+        done:
+          url: "**/labs"
+      - type: "wait"
+        duration: 5000
+      - type: "click"
+        target:
+          selector: "nav[aria-label='Main'] a[href='/providers'] >> visible=true"
+        done:
+          url: "**/providers"
+      - type: "wait"
+        duration: 6100
+    timing: "after"
+    audioDuration: 0
+    videoDuration: 12465
+  - id: "code-viewer"
+    intent: "The code page; hover Download ZIP."
+    actions:
+      - type: "click"
+        target:
+          selector: "nav[aria-label='Main'] a[href='/code'] >> visible=true"
+        done:
+          url: "**/code"
+      - type: "wait"
+        duration: 5000
+      - type: "hover"
+        target:
+          role: "link"
+          name: "Download ZIP"
+      - type: "wait"
+        duration: 16300
+    timing: "after"
+    audioDuration: 0
+    videoDuration: 22537
+  - id: "arch-routes"
+    intent: "Quick open the models route handler (thin layer)."
+    actions:
+      - type: "press"
+        key: "Control+P"
+      - type: "type"
+        target:
+          placeholder: "Type a file name…"
+        text: "src/app/api/v1/models/route.ts"
+        delay: 30
+      - type: "press"
+        key: "Enter"
+        done:
+          visible: "[aria-label='Contents of src/app/api/v1/models/route.ts']"
+      - type: "wait"
+        duration: 18600
+    timing: "after"
+    audioDuration: 0
+    videoDuration: 20570
+  - id: "arch-services"
+    intent: "Quick open the models service (the only database access)."
+    actions:
+      - type: "press"
+        key: "Control+P"
+      - type: "type"
+        target:
+          placeholder: "Type a file name…"
+        text: "src/server/services/models.ts"
+        delay: 30
+      - type: "press"
+        key: "Enter"
+        done:
+          visible: "[aria-label='Contents of src/server/services/models.ts']"
+      - type: "wait"
+        duration: 23500
+    timing: "after"
+    audioDuration: 0
+    videoDuration: 25427
+  - id: "caching"
+    intent: "Quick open services/common.ts ('use cache', cacheLife, cacheTag)."
+    actions:
+      - type: "press"
+        key: "Control+P"
+      - type: "type"
+        target:
+          placeholder: "Type a file name…"
+        text: "src/server/services/common.ts"
+        delay: 30
+      - type: "press"
+        key: "Enter"
+        done:
+          visible: "[aria-label='Contents of src/server/services/common.ts']"
+      - type: "wait"
+        duration: 20700
+    timing: "after"
+    audioDuration: 0
+    videoDuration: 22566
+  - id: "pipeline"
+    intent: "Quick open the join key (scripts/ingest/join.ts)."
+    actions:
+      - type: "press"
+        key: "Control+P"
+      - type: "type"
+        target:
+          placeholder: "Type a file name…"
+        text: "scripts/ingest/join.ts"
+        delay: 30
+      - type: "press"
+        key: "Enter"
+        done:
+          visible: "[aria-label='Contents of scripts/ingest/join.ts']"
+      - type: "wait"
+        duration: 32200
+    timing: "after"
+    audioDuration: 0
+    videoDuration: 33786
+  - id: "database"
+    intent: "Quick open prisma/schema.prisma; scroll to the Model table."
+    actions:
+      - type: "press"
+        key: "Control+P"
+      - type: "type"
+        target:
+          placeholder: "Type a file name…"
+        text: "prisma/schema.prisma"
+        delay: 30
+      - type: "press"
+        key: "Enter"
+        done:
+          visible: "[aria-label='Contents of prisma/schema.prisma']"
+      - type: "wait"
+        duration: 3000
+      - type: "scroll"
+        target:
+          selector: "[aria-label='Line 62'] >> visible=true"
+      - type: "wait"
+        duration: 24400
+    timing: "after"
+    audioDuration: 0
+    videoDuration: 28869
+  - id: "ask-the-code"
+    intent: "Open Ask the code, play the prepared answer about a filter change end to end."
+    actions:
+      - type: "click"
+        target:
+          role: "button"
+          name: "Ask the code: how this app works"
+      - type: "wait"
+        duration: 2000
+      - type: "click"
+        target:
+          role: "button"
+          name: "Walk me through what happens when I change a filter"
+      - type: "wait"
+        duration: 19900
+      - type: "press"
+        key: "Escape"
+    timing: "after"
+    audioDuration: 0
+    videoDuration: 23356
+  - id: "decisions"
+    intent: "Quick open the decision log (docs/03-architecture.md)."
+    actions:
+      - type: "press"
+        key: "Control+P"
+      - type: "type"
+        target:
+          placeholder: "Type a file name…"
+        text: "docs/03-architecture.md"
+        delay: 30
+      - type: "press"
+        key: "Enter"
+        done:
+          visible: "[aria-label='Contents of docs/03-architecture.md']"
+      - type: "wait"
+        duration: 2000
+      - type: "scroll"
+        target:
+          selector: "[aria-label='Line 44'] >> visible=true"
+      - type: "wait"
+        duration: 24900
+    timing: "after"
+    audioDuration: 0
+    videoDuration: 28520
+  - id: "challenges"
+    intent: "Scroll through the decision log entries (the challenges and their fixes)."
+    actions:
+      - type: "scroll"
+        target:
+          selector: "[aria-label='Line 145'] >> visible=true"
+      - type: "wait"
+        duration: 18000
+      - type: "scroll"
+        target:
+          selector: "[aria-label='Line 180'] >> visible=true"
+      - type: "wait"
+        duration: 31600
+    timing: "after"
+    audioDuration: 0
+    videoDuration: 49659
+  - id: "quality"
+    intent: "Back home, switch to the light theme."
+    actions:
+      - type: "click"
+        target:
+          role: "link"
+          name: "OneAtlas home"
+        done:
+          url: "http://localhost:3300/"
+      - type: "wait"
+        duration: 4000
+      - type: "click"
+        target:
+          role: "button"
+          name: "Switch between light and dark theme"
+      - type: "wait"
+        duration: 15400
+    timing: "after"
+    audioDuration: 0
+    videoDuration: 20920
+  - id: "outro"
+    intent: "Hero in light mode, cursor on the headline, then rest."
+    actions:
+      - type: "hover"
+        target:
+          selector: "h1 .hover-letter >> visible=true >> nth=6"
+      - type: "wait"
+        duration: 20400
+    timing: "after"
+    audioDuration: 0
+    videoDuration: 20887

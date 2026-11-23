@@ -52,3 +52,13 @@ next-env.d.ts
 
 # generated at build time by scripts/build-code-index.ts
 /public/oneatlas-source.zip
+
+# ndemo (demo-video toolkit, cloned from github.com/splitbrain/ndemo) and its generated output
+/.claude/skills/ndemo/
+/.ndemo/
+/demo/*/audio/
+/demo/*/video-raw/
+/demo/*/.frames/
+/demo/*/*.mp4
+/demo/*/*.mp3
+/demo/*/*.srt

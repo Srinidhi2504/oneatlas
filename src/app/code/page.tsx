@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { HoverText } from "@/components/ui/HoverText";
 import { Suspense } from "react";
 import { CodeExplorer } from "@/components/code/CodeExplorer";
 import { Skeleton } from "@/components/ui/primitives";
@@ -17,7 +18,9 @@ export default function CodePage() {
     <>
       <div className="flex flex-col gap-1 pt-6 pb-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="enter text-[28px] leading-9">Source code</h1>
+          <h1 className="enter text-[28px] leading-9">
+            <HoverText text="Source code" />
+          </h1>
           <p className="enter mt-1 max-w-[70ch] text-muted" style={{ ["--stagger" as string]: 1 }}>
             The whole codebase, {formatInteger(files.length)} files and {formatInteger(lines)} lines, exactly as deployed. Click a line number to share a link to it.
           </p>

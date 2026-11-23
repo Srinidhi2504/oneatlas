@@ -334,3 +334,18 @@
 }
 :root[data-theme="dark"] .theme-icon-dark { display: block; }
 :root[data-theme="dark"] .theme-icon-light { display: none; }
+
+/* ---------- hover text (components/ui/HoverText.tsx): --i is set per letter by JS, CSS does the rest ---------- */
+:root { --hover-gold: #b07a0c; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --hover-gold: #f2c75c; } }
+:root[data-theme="dark"] { --hover-gold: #f2c75c; }
+.hover-letter {
+  display: inline-block;
+  /* transform and colour only: no layout shift, so neighbours never jump */
+  transform: scale(calc(1 + var(--i, 0) * 0.32)) translateY(calc(var(--i, 0) * -0.04em));
+  transform-origin: 50% 85%;
+  color: color-mix(in srgb, var(--hover-gold) calc(var(--i, 0) * 100%), currentColor);
+  transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1), color 0.28s ease-out;
+  will-change: transform;
+}
+@media (hover: none) { .hover-letter { transform: none !important; color: inherit !important; } }

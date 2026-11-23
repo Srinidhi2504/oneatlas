@@ -1,4 +1,5 @@
 import { ChevronRight } from "lucide-react";
+import { HoverText } from "@/components/ui/HoverText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -66,7 +67,9 @@ async function LabView({ params }: Pick<PageProps<"/labs/[slug]">, "params">) {
       </nav>
       <header className="flex items-center gap-3.5 pt-4 pb-6">
         <LabAvatar slug={lab.slug} name={lab.name} size={44} />
-        <h1 className="enter text-[28px] leading-9">{lab.name}</h1>
+        <h1 className="enter text-[28px] leading-9">
+          <HoverText text={lab.name} />
+        </h1>
       </header>
 
       <dl className="grid grid-cols-2 overflow-hidden rounded-[var(--radius-panel)] border border-border sm:grid-cols-3 lg:grid-cols-5">

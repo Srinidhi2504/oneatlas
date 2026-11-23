@@ -2,6 +2,7 @@
 import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/cn";
+import { HoverText } from "./HoverText";
 
 /** Responsive card grid (plain string: safe to import from server and client components). */
 export const cardGrid = "grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3";
@@ -78,8 +79,8 @@ export function PageHeader({ title, description, actions, children }: { title: R
   return (
     <div className="flex flex-col gap-3 pt-8 pb-6 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
-        <h1 className="enter text-[28px] leading-9">{title}</h1>
-        {description ? <p className="enter mt-1.5 max-w-[68ch] text-muted" style={{ ["--stagger" as string]: 1 }}>{description}</p> : null}
+        <h1 className="enter text-[28px] leading-9">{typeof title === "string" ? <HoverText text={title} /> : title}</h1>
+        {description ? <p className="enter mt-1.5 max-w-[68ch] text-muted" style={{ ["--stagger" as string]: 1 }}>{typeof description === "string" ? <HoverText text={description} /> : description}</p> : null}
         {children}
       </div>
       {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
@@ -95,7 +96,7 @@ export function SectionTitle({ children, id, aside }: { children: ReactNode; id?
   return (
     <div className="mb-3 flex items-baseline justify-between gap-4">
       <h2 id={id} className="text-base">
-        {children}
+        {typeof children === "string" ? <HoverText text={children} /> : children}
       </h2>
       {aside ? <div className="text-13 text-muted">{aside}</div> : null}
     </div>

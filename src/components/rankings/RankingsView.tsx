@@ -232,7 +232,7 @@ export function RankingsView({
                       type="button"
                       onClick={() => setState({ lab: [l.lab.slug], page: null })}
                       className="group w-full rounded-[var(--radius-control)] px-1.5 py-1 text-left hover:bg-surface-2"
-                      aria-label={`Filter to ${l.lab.name}: ${l.count} models in the top 100`}
+                      aria-label={`Filter to ${l.lab.name} ${l.count} models in the top 100`}
                     >
                       <span className="flex items-baseline justify-between text-13">
                         <span className="truncate group-hover:text-accent">{l.lab.name}</span>

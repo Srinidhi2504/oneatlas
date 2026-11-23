@@ -53,7 +53,7 @@ export function AtlasGlobe({ className }: { className?: string }) {
     const hubs = HUBS.map(([la, lo]) => toVec(la, lo));
     const arcs = ARCS.map(([a, b]) => arcPoints(hubs[a], hubs[b]));
 
-    let colors = { dot: "#888", accent: "#2d3fb5", rim: "#ccc", palette: ["#2d3fb5"] };
+    let colors = { dot: "#888", accent: "#7a5800", rim: "#ccc", palette: ["#7a5800"] };
     const readColors = () => {
       const cs = getComputedStyle(document.documentElement);
       const v = (name: string) => cs.getPropertyValue(name).trim();

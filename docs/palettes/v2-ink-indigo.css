@@ -1,0 +1,96 @@
+/* ROLLBACK: the "ink and indigo" palette (git tag palette-v2-indigo). Copy these token blocks over the matching ones at the top of src/app/globals.css. */
+@import "tailwindcss";
+
+/*
+ * OneAtlas design tokens. One accent ("sapphire indigo"), ink-navy neutrals, hairline borders.
+ * Theme: system by default; <html data-theme="light|dark"> overrides (set before paint by the inline script in layout.tsx).
+ * Contrast: fg/muted/faint/accent are all >= 4.5:1 on bg and surface in both themes.
+ */
+:root {
+  color-scheme: light;
+  --bg: #fbfbfd;
+  --surface: #f3f4f9;
+  --surface-2: #e8eaf3;
+  --border: #e1e4ee;
+  --border-strong: #c6cbdb;
+  --fg: #0e1324;
+  --muted: #4a526a;
+  --faint: #586078;
+  --accent: #2d3fb5;
+  --accent-hover: #232f93;
+  --accent-fg: #ffffff;
+  --accent-soft: #eaedfb;
+  --success: #17703d;
+  --warning: #8a5a00;
+  --danger: #b42c22;
+  --bar: #2d3fb5;
+  --bar-track: #e5e8f2;
+  /* data palette: each capability / type / benchmark family has one hue (text >= 5:1 on its soft background) */
+  --c-blue: #1c5bb0; --c-blue-soft: #e8f0fb;
+  --c-violet: #6a3cbc; --c-violet-soft: #f1ebfb;
+  --c-amber: #875400; --c-amber-soft: #fbf0d9;
+  --c-coral: #b03a0b; --c-coral-soft: #fdebe3;
+  --c-green: #16693a; --c-green-soft: #e4f3e9;
+  --c-rose: #ae2257; --c-rose-soft: #fbe8ef;
+  /* syntax colours for the code viewer */
+  --syn-keyword: #c22a4a; --syn-string: #17703d; --syn-number: #1c5bb0; --syn-fn: #6a3cbc;
+  --syn-type: #9a4f00; --syn-tag: #2d3fb5; --syn-comment: #586078;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0a0d16;
+    --surface: #10141f;
+    --surface-2: #181d2b;
+    --border: #222939;
+    --border-strong: #343e55;
+    --fg: #e8ebf5;
+    --muted: #a4abc0;
+    --faint: #8d95ac;
+    --accent: #8f9eff;
+    --accent-hover: #aab6ff;
+    --accent-fg: #0a0e2a;
+    --accent-soft: #1a2042;
+    --success: #4cc38a;
+    --warning: #e2a63c;
+    --danger: #f2766b;
+    --bar: #8f9eff;
+    --bar-track: #1d2335;
+    --c-blue: #79b0ff; --c-blue-soft: #152539;
+    --c-violet: #bba4ff; --c-violet-soft: #231d38;
+    --c-amber: #f2b84f; --c-amber-soft: #30260f;
+    --c-coral: #ff8f63; --c-coral-soft: #381e14;
+    --c-green: #5ccb94; --c-green-soft: #122e1f;
+    --c-rose: #ff86b0; --c-rose-soft: #371726;
+    --syn-keyword: #ff7b8a; --syn-string: #7ee0a6; --syn-number: #79b0ff; --syn-fn: #c6b0ff;
+    --syn-type: #ffb066; --syn-tag: #8f9eff; --syn-comment: #8d95ac;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0a0d16;
+  --surface: #10141f;
+  --surface-2: #181d2b;
+  --border: #222939;
+  --border-strong: #343e55;
+  --fg: #e8ebf5;
+  --muted: #a4abc0;
+  --faint: #8d95ac;
+  --accent: #8f9eff;
+  --accent-hover: #aab6ff;
+  --accent-fg: #0a0e2a;
+  --accent-soft: #1a2042;
+  --success: #4cc38a;
+  --warning: #e2a63c;
+  --danger: #f2766b;
+  --bar: #8f9eff;
+  --bar-track: #1d2335;
+    --c-blue: #79b0ff; --c-blue-soft: #152539;
+    --c-violet: #bba4ff; --c-violet-soft: #231d38;
+    --c-amber: #f2b84f; --c-amber-soft: #30260f;
+    --c-coral: #ff8f63; --c-coral-soft: #381e14;
+    --c-green: #5ccb94; --c-green-soft: #122e1f;
+    --c-rose: #ff86b0; --c-rose-soft: #371726;
+    --syn-keyword: #ff7b8a; --syn-string: #7ee0a6; --syn-number: #79b0ff; --syn-fn: #c6b0ff;

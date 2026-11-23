@@ -1,29 +1,29 @@
 @import "tailwindcss";
 
 /*
- * OneAtlas design tokens. One accent ("survey teal"), cool graphite neutrals, hairline borders.
+ * OneAtlas design tokens. One accent ("sapphire indigo"), ink-navy neutrals, hairline borders.
  * Theme: system by default; <html data-theme="light|dark"> overrides (set before paint by the inline script in layout.tsx).
  * Contrast: fg/muted/faint/accent are all >= 4.5:1 on bg and surface in both themes.
  */
 :root {
   color-scheme: light;
-  --bg: #ffffff;
-  --surface: #f6f7f8;
-  --surface-2: #eceef1;
-  --border: #e2e5e9;
-  --border-strong: #c9ced5;
-  --fg: #14171b;
-  --muted: #535b66;
-  --faint: #5d6570;
-  --accent: #0b6e6a;
-  --accent-hover: #095a57;
+  --bg: #fbfbfd;
+  --surface: #f3f4f9;
+  --surface-2: #e8eaf3;
+  --border: #e1e4ee;
+  --border-strong: #c6cbdb;
+  --fg: #0e1324;
+  --muted: #4a526a;
+  --faint: #586078;
+  --accent: #2d3fb5;
+  --accent-hover: #232f93;
   --accent-fg: #ffffff;
-  --accent-soft: #e5f2f1;
+  --accent-soft: #eaedfb;
   --success: #17703d;
   --warning: #8a5a00;
   --danger: #b42c22;
-  --bar: #0b6e6a;
-  --bar-track: #e7ebee;
+  --bar: #2d3fb5;
+  --bar-track: #e5e8f2;
   /* data palette: each capability / type / benchmark family has one hue (text >= 5:1 on its soft background) */
   --c-blue: #1c5bb0; --c-blue-soft: #e8f0fb;
   --c-violet: #6a3cbc; --c-violet-soft: #f1ebfb;
@@ -33,29 +33,29 @@
   --c-rose: #ae2257; --c-rose-soft: #fbe8ef;
   /* syntax colours for the code viewer */
   --syn-keyword: #c22a4a; --syn-string: #17703d; --syn-number: #1c5bb0; --syn-fn: #6a3cbc;
-  --syn-type: #9a4f00; --syn-tag: #0b6e6a; --syn-comment: #5d6570;
+  --syn-type: #9a4f00; --syn-tag: #2d3fb5; --syn-comment: #586078;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #0f1216;
-    --surface: #151a1f;
-    --surface-2: #1d2329;
-    --border: #262d35;
-    --border-strong: #38434e;
-    --fg: #e7eaed;
-    --muted: #a3acb6;
-    --faint: #8d97a2;
-    --accent: #4cc2b8;
-    --accent-hover: #6fd3ca;
-    --accent-fg: #052523;
-    --accent-soft: #10302d;
+    --bg: #0a0d16;
+    --surface: #10141f;
+    --surface-2: #181d2b;
+    --border: #222939;
+    --border-strong: #343e55;
+    --fg: #e8ebf5;
+    --muted: #a4abc0;
+    --faint: #8d95ac;
+    --accent: #8f9eff;
+    --accent-hover: #aab6ff;
+    --accent-fg: #0a0e2a;
+    --accent-soft: #1a2042;
     --success: #4cc38a;
     --warning: #e2a63c;
     --danger: #f2766b;
-    --bar: #4cc2b8;
-    --bar-track: #222a31;
+    --bar: #8f9eff;
+    --bar-track: #1d2335;
     --c-blue: #79b0ff; --c-blue-soft: #152539;
     --c-violet: #bba4ff; --c-violet-soft: #231d38;
     --c-amber: #f2b84f; --c-amber-soft: #30260f;
@@ -63,29 +63,29 @@
     --c-green: #5ccb94; --c-green-soft: #122e1f;
     --c-rose: #ff86b0; --c-rose-soft: #371726;
     --syn-keyword: #ff7b8a; --syn-string: #7ee0a6; --syn-number: #79b0ff; --syn-fn: #c6b0ff;
-    --syn-type: #ffb066; --syn-tag: #4cc2b8; --syn-comment: #8d97a2;
+    --syn-type: #ffb066; --syn-tag: #8f9eff; --syn-comment: #8d95ac;
   }
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #0f1216;
-  --surface: #151a1f;
-  --surface-2: #1d2329;
-  --border: #262d35;
-  --border-strong: #38434e;
-  --fg: #e7eaed;
-  --muted: #a3acb6;
-  --faint: #8d97a2;
-  --accent: #4cc2b8;
-  --accent-hover: #6fd3ca;
-  --accent-fg: #052523;
-  --accent-soft: #10302d;
+  --bg: #0a0d16;
+  --surface: #10141f;
+  --surface-2: #181d2b;
+  --border: #222939;
+  --border-strong: #343e55;
+  --fg: #e8ebf5;
+  --muted: #a4abc0;
+  --faint: #8d95ac;
+  --accent: #8f9eff;
+  --accent-hover: #aab6ff;
+  --accent-fg: #0a0e2a;
+  --accent-soft: #1a2042;
   --success: #4cc38a;
   --warning: #e2a63c;
   --danger: #f2766b;
-  --bar: #4cc2b8;
-  --bar-track: #222a31;
+  --bar: #8f9eff;
+  --bar-track: #1d2335;
     --c-blue: #79b0ff; --c-blue-soft: #152539;
     --c-violet: #bba4ff; --c-violet-soft: #231d38;
     --c-amber: #f2b84f; --c-amber-soft: #30260f;
@@ -93,7 +93,7 @@
     --c-green: #5ccb94; --c-green-soft: #122e1f;
     --c-rose: #ff86b0; --c-rose-soft: #371726;
     --syn-keyword: #ff7b8a; --syn-string: #7ee0a6; --syn-number: #79b0ff; --syn-fn: #c6b0ff;
-    --syn-type: #ffb066; --syn-tag: #4cc2b8; --syn-comment: #8d97a2;
+    --syn-type: #ffb066; --syn-tag: #8f9eff; --syn-comment: #8d95ac;
 }
 
 @theme inline {

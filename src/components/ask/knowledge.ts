@@ -591,7 +591,7 @@ On phones the tree becomes a drawer, and the status bar shows the language, line
 
 ## Colour
 - **Neutrals**: background, surface, border, text, muted and faint, each defined for light and dark.
-- **One brand accent**, a deep teal that matches the globe logo.
+- **One brand accent**, a deep sapphire indigo (a lighter periwinkle in dark mode) that matches the globe logo.
 - **A six-hue data palette** (blue, violet, amber, coral, green, rose), each with a soft background. Colour carries **meaning, not decoration**: one hue per capability, model type and benchmark family, used everywhere that thing appears ({{src/lib/tones.ts|export const CAPABILITY_TONE}}). Reasoning is always violet, tool calling amber, vision coral.
 - Every text colour was checked at **5:1 contrast or better** on its background in both themes, and colour is never the only signal (labels always accompany it).
 - **Lab avatars** get a stable hue from a hash of the lab's slug, so a lab keeps its colour on every page ({{src/components/ui/primitives.tsx|export function labHue}}).

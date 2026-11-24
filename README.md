@@ -21,7 +21,7 @@ Find, compare and rank AI models across labs and API providers. OneAtlas covers 
 - **Labs and providers**: directories, lab pages (models, providers serving them) and provider pages (models at that provider's prices).
 - **Code** (`/code`): the whole codebase in an editor-style viewer: file tree with each file's purpose, tabs, breadcrumbs, syntax highlighting, search across files, `Ctrl+P` quick open and shareable line links. **Download ZIP** gives you the complete repository exactly as deployed.
 - **Ask the code**: a chat panel that explains how this app is built. It serves 32 prepared answers (free, ordered by importance) that play back with a reading trail, streamed text, `path:line` citations that open the exact lines, and follow-ups. A Live mode (Claude reading the code through tools) switches on when `ANTHROPIC_API_KEY` is set.
-- **Look and feel**: gold, black and warm-white palette in light and dark, pointer-reactive headings (letters near the mouse turn gold and grow), a canvas 3D globe, scroll-driven reveals, odometer numbers, a 3D podium. CSS and canvas only, and all of it off under `prefers-reduced-motion`.
+- **Look and feel**: gold, black and warm-white palette in light and dark, pointer-reactive headings (letters near the mouse turn gold and grow), a WebGL2 particle globe that turns liquid under the cursor (Canvas 2D fallback), scroll-driven reveals, odometer numbers, a 3D podium. CSS, canvas and raw WebGL only, no animation library, and all of it off under `prefers-reduced-motion`.
 - **Everywhere**: `Ctrl/Cmd+K` command palette, `/` to focus search, light/dark switch (follows the OS on first visit), a compare tray, and loading, empty and error states. Full-width layout from 360 px phones to 2560 px monitors.
 
 ## Architecture

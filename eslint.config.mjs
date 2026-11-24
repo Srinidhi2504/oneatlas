@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // local, gitignored tools (the ndemo skill) are not project code
+    ".claude/**",
   ]),
 ]);
 
